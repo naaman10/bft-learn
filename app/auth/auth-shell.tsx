@@ -10,9 +10,11 @@ export function AuthShell({
   return (
     <main className="flex min-h-full flex-1 flex-col items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm">
-        <p className="mb-2 text-center text-sm font-semibold tracking-wide text-accent uppercase">
-          BFT Learn
-        </p>
+        <img
+          src="/bft-learn-logo.png"
+          alt="BFT Learn"
+          className="mx-auto mb-4 h-10"
+        />
         <h1 className="mb-8 text-center text-2xl font-semibold tracking-tight">
           {title}
         </h1>

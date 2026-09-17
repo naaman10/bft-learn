@@ -1,16 +1,47 @@
 "use client";
 
-import { useActionState } from "react";
-import { signInWithEmail } from "./actions";
+import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth/client";
 
 export function SignInForm({ initialError }: { initialError?: string }) {
-  const [state, formAction, isPending] = useActionState(
-    signInWithEmail,
-    initialError ? { error: initialError } : null
-  );
+  const router = useRouter();
+  const [error, setError] = useState(initialError ?? "");
+  const [isPending, setIsPending] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setIsPending(true);
+
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") ?? "").trim();
+    const password = String(formData.get("password") ?? "");
+
+    if (!email || !password) {
+      setError("Email and password are required.");
+      setIsPending(false);
+      return;
+    }
+
+    const { error: signInError } = await authClient.signIn.email({
+      email,
+      password,
+      callbackURL: "/dashboard",
+    });
+
+    if (signInError) {
+      setError(signInError.message || "Failed to sign in. Try again.");
+      setIsPending(false);
+      return;
+    }
+
+    router.replace("/dashboard");
+    router.refresh();
+  }
 
   return (
-    <form action={formAction} className="flex flex-col gap-5">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <div className="flex flex-col gap-1.5">
         <label htmlFor="email" className="text-sm font-medium text-foreground">
           Email address
@@ -44,12 +75,12 @@ export function SignInForm({ initialError }: { initialError?: string }) {
         />
       </div>
 
-      {state?.error && (
+      {error && (
         <p
           role="alert"
           className="rounded-lg bg-error-bg px-3 py-2 text-sm text-error"
         >
-          {state.error}
+          {error}
         </p>
       )}
 
