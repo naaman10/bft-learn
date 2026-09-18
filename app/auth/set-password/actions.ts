@@ -1,6 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
+import { proxyNeonAuthRequest } from "@/lib/auth/neon-proxy";
 import { auth } from "@/lib/auth/server";
 
 function errorMessageFromBody(body: unknown): string | null {
@@ -40,10 +41,12 @@ async function postAuthJson(path: string[], body: Record<string, unknown>) {
     headerStore.get("host") ??
     "localhost:3000";
   const proto = headerStore.get("x-forwarded-proto") ?? "http";
-  const origin = headerStore.get("origin") ?? `${proto}://${host}`;
+  const origin = (headerStore.get("origin") ?? `${proto}://${host}`).replace(
+    /\/$/,
+    ""
+  );
 
-  const { POST } = auth.handler();
-  const response = await POST(
+  const response = await proxyNeonAuthRequest(
     new Request(`${origin}/api/auth/${path.join("/")}`, {
       method: "POST",
       headers: {
@@ -53,7 +56,7 @@ async function postAuthJson(path: string[], body: Record<string, unknown>) {
       },
       body: JSON.stringify(body),
     }),
-    { params: Promise.resolve({ path }) }
+    path
   );
 
   const raw = await response.text();
