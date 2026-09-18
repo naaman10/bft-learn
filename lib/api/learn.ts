@@ -1,7 +1,12 @@
 import { cache } from "react";
 import { apiFetch, ApiError } from "@/lib/api/client";
 
-export type ProgressStatus = "not_started" | "in_progress" | "completed";
+export type ProgressStatus =
+  | "not_started"
+  | "in_progress"
+  | "completed"
+  | "to_assess"
+  | "assessed";
 
 export type Enrollment = {
   contentId: string;
@@ -133,9 +138,44 @@ export function progressLabel(status: string) {
       return "In progress";
     case "completed":
       return "Completed";
+    case "to_assess":
+      return "To assess";
+    case "assessed":
+      return "Assessed";
     default:
       return status.replaceAll("_", " ");
   }
+}
+
+export function isSubmittedProgress(status: string) {
+  return (
+    status === "completed" || status === "to_assess" || status === "assessed"
+  );
+}
+
+type ProgressPatch = {
+  action: "complete";
+  currentItemId?: string;
+  items?: Record<
+    string,
+    {
+      answer?: unknown;
+      status?: Extract<ProgressStatus, "not_started" | "in_progress" | "completed">;
+    }
+  >;
+};
+
+export async function completeLearnContent(
+  contentId: string,
+  patch: ProgressPatch
+) {
+  return apiFetch<{
+    progressStatus: ProgressStatus;
+    completedAt: string | null;
+  }>(`/learn/content/${encodeURIComponent(contentId)}/progress`, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
 }
 
 export async function getLearnUser(): Promise<LearnUserResponse | null> {

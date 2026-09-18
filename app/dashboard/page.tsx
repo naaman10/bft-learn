@@ -2,7 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/server";
 import { hasCredentialAccount } from "@/lib/auth/accounts";
-import { getLearnUser, progressLabel, type Enrollment } from "@/lib/api/learn";
+import {
+  getLearnUser,
+  isSubmittedProgress,
+  progressLabel,
+  type Enrollment,
+} from "@/lib/api/learn";
 import { AppHeader } from "@/app/app-header";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +24,11 @@ function enrolledDate(value: string) {
 function EnrollmentCard({ enrollment }: { enrollment: Enrollment }) {
   const assignedOn = enrolledDate(enrollment.enrolledAt);
   const actionLabel =
-    enrollment.progressStatus === "not_started" ? "Start" : "Continue";
+    enrollment.progressStatus === "not_started"
+      ? "Start"
+      : isSubmittedProgress(enrollment.progressStatus)
+        ? "View"
+        : "Continue";
 
   return (
     <article className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-6 shadow-sm">

@@ -5,9 +5,14 @@ import { hasCredentialAccount } from "@/lib/auth/accounts";
 import {
   getCourseSections,
   getLearnContent,
+  isSubmittedProgress,
   progressLabel,
 } from "@/lib/api/learn";
 import { AppHeader } from "@/app/app-header";
+import {
+  CompleteButton,
+  CompleteContentForm,
+} from "@/app/learn/complete-content-form";
 import { InfoSection } from "@/app/learn/info-section";
 import { QuestionTextSection } from "@/app/learn/question-text-section";
 
@@ -55,6 +60,64 @@ export default async function LearnSectionPage({
     sectionIndex >= 0 &&
     sectionIndex < sections.length;
   const section = sectionValid ? sections[sectionIndex] : null;
+  const isLastSection =
+    sectionValid && sections.length > 0 && sectionIndex === sections.length - 1;
+  const submitted = result.ok && isSubmittedProgress(result.data.progressStatus);
+  const canComplete = Boolean(isLastSection && !submitted);
+
+  const sectionCard = (
+    <div className="flex flex-1 flex-col rounded-2xl border border-border bg-card p-8 shadow-sm">
+      {!section ? (
+        <p className="text-muted">This section could not be found.</p>
+      ) : section.contentType === "infoSection" ? (
+        <InfoSection section={section} />
+      ) : section.contentType === "question" ? (
+        <QuestionTextSection
+          section={section}
+          savedAnswer={
+            section.entryId && result.ok
+              ? result.data.progress.items[section.entryId]?.answer
+              : undefined
+          }
+        />
+      ) : (
+        <p className="text-muted">This section type is not available yet.</p>
+      )}
+    </div>
+  );
+
+  const sectionNav =
+    sections.length > 0 ? (
+      <nav className="flex items-center justify-between gap-4">
+        {sectionValid && sectionIndex > 0 ? (
+          <Link
+            href={`/learn/${contentId}/${sectionIndex - 1}`}
+            className="text-sm font-medium text-accent hover:text-accent-hover"
+          >
+            Previous
+          </Link>
+        ) : (
+          <span />
+        )}
+        <p className="text-sm text-muted">
+          {sectionValid ? sectionIndex + 1 : 0} of {sections.length}
+        </p>
+        {sectionValid && sectionIndex < sections.length - 1 ? (
+          <Link
+            href={`/learn/${contentId}/${sectionIndex + 1}`}
+            className="text-sm font-medium text-accent hover:text-accent-hover"
+          >
+            Next
+          </Link>
+        ) : canComplete ? (
+          <CompleteButton />
+        ) : isLastSection && submitted ? (
+          <span className="text-sm font-medium text-muted">Completed</span>
+        ) : (
+          <span />
+        )}
+      </nav>
+    ) : null;
 
   return (
     <main className="flex min-h-full flex-1 flex-col">
@@ -102,53 +165,19 @@ export default async function LearnSectionPage({
               </p>
             </div>
 
-            <div className="flex flex-1 flex-col rounded-2xl border border-border bg-card p-8 shadow-sm">
-              {!section ? (
-                <p className="text-muted">This section could not be found.</p>
-              ) : section.contentType === "infoSection" ? (
-                <InfoSection section={section} />
-              ) : section.contentType === "question" ? (
-                <QuestionTextSection
-                  section={section}
-                  savedAnswer={
-                    section.entryId
-                      ? result.data.progress.items[section.entryId]?.answer
-                      : undefined
-                  }
-                />
-              ) : (
-                <p className="text-muted">
-                  This section type is not available yet.
-                </p>
-              )}
-            </div>
-
-            {sections.length > 0 && (
-              <nav className="flex items-center justify-between gap-4">
-                {sectionValid && sectionIndex > 0 ? (
-                  <Link
-                    href={`/learn/${contentId}/${sectionIndex - 1}`}
-                    className="text-sm font-medium text-accent hover:text-accent-hover"
-                  >
-                    Previous
-                  </Link>
-                ) : (
-                  <span />
-                )}
-                <p className="text-sm text-muted">
-                  {sectionValid ? sectionIndex + 1 : 0} of {sections.length}
-                </p>
-                {sectionValid && sectionIndex < sections.length - 1 ? (
-                  <Link
-                    href={`/learn/${contentId}/${sectionIndex + 1}`}
-                    className="text-sm font-medium text-accent hover:text-accent-hover"
-                  >
-                    Next
-                  </Link>
-                ) : (
-                  <span />
-                )}
-              </nav>
+            {canComplete ? (
+              <CompleteContentForm
+                contentId={contentId}
+                itemId={section?.entryId}
+              >
+                {sectionCard}
+                {sectionNav}
+              </CompleteContentForm>
+            ) : (
+              <>
+                {sectionCard}
+                {sectionNav}
+              </>
             )}
           </>
         )}
