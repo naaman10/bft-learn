@@ -27,7 +27,6 @@ export function SignInForm({ initialError }: { initialError?: string }) {
     const { error: signInError } = await authClient.signIn.email({
       email,
       password,
-      callbackURL: `${window.location.origin}/dashboard`,
     });
 
     if (signInError) {
