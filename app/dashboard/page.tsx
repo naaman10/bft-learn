@@ -75,7 +75,7 @@ function EnrollmentCard({
     <article
       className={`relative min-h-[12rem] overflow-hidden rounded-[28px] p-5 shadow-[var(--shadow-card)] ${palettes[index % palettes.length]}`}
     >
-      <div className="pointer-events-none absolute -right-2 -top-4 h-32 w-40">
+      <div className="pointer-events-none absolute -bottom-3 -right-2 h-32 w-40">
         <CourseDoodle index={index} />
       </div>
       <div className="relative flex items-start justify-between gap-3">
@@ -92,12 +92,12 @@ function EnrollmentCard({
         {enrollment.name.trim() || "Assigned work"}
       </h2>
       {assignedOn ? (
-        <p className="relative mt-2 text-sm text-foreground/70">
+        <p className="relative mt-2 max-w-[70%] text-sm text-foreground/70">
           Assigned {assignedOn}
         </p>
       ) : null}
       {href ? (
-        <p className="relative mt-5 text-sm font-semibold text-foreground">
+        <p className="relative mt-5 max-w-[70%] text-sm font-semibold text-foreground">
           {actionCopy(enrollment.progressStatus)}
         </p>
       ) : null}
@@ -162,7 +162,7 @@ export default async function DashboardPage() {
           };
 
   return (
-    <AppShell current="home" learnHref={learnHref}>
+    <AppShell>
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-5 py-4 md:px-8 md:py-2">
         <section className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">

@@ -6,45 +6,6 @@ function iconClass(className?: string) {
   return className ?? "h-5 w-5";
 }
 
-export function HomeIcon({ className, ...props }: IconProps) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={iconClass(className)}
-      aria-hidden="true"
-      {...props}
-    >
-      <path d="M4 10.5 12 4l8 6.5V20a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20z" />
-      <path d="M9.5 21.5v-7h5v7" />
-    </svg>
-  );
-}
-
-export function BookIcon({ className, ...props }: IconProps) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={iconClass(className)}
-      aria-hidden="true"
-      {...props}
-    >
-      <path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H20v16.5H7.5A2.5 2.5 0 0 0 5 22z" />
-      <path d="M5 5.5v16.5" />
-      <path d="M9 8h7" />
-    </svg>
-  );
-}
-
 export function ChevronLeftIcon({ className, ...props }: IconProps) {
   return (
     <svg

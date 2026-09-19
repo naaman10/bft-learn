@@ -158,7 +158,7 @@ export default async function LearnSectionPage({
     : "Unable to open course";
 
   return (
-    <AppShell current="learn" learnHref={`/learn/${contentId}`}>
+    <AppShell>
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-5 px-5 py-4 pb-[5.75rem] md:px-8 md:py-2 md:pb-8">
         <div className="flex items-center gap-3">
           <CircleLink href="/dashboard" label="Back to home">
