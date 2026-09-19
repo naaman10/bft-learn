@@ -18,6 +18,13 @@ export function SignInForm({ initialError }: { initialError?: string }) {
     const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
 
+    console.log("[sign-in] Attempting sign-in", {
+      email,
+      hasPassword: !!password,
+      origin: window.location.origin,
+      userAgent: navigator.userAgent,
+    });
+
     if (!email || !password) {
       setError("Email and password are required.");
       setIsPending(false);
@@ -30,6 +37,14 @@ export function SignInForm({ initialError }: { initialError?: string }) {
     });
 
     if (signInError) {
+      console.error("[sign-in] Authentication failed", {
+        message: signInError.message,
+        code: (signInError as any).code,
+        status: (signInError as any).status,
+        email,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+      });
       setError(signInError.message || "Failed to sign in. Try again.");
       setIsPending(false);
       return;
