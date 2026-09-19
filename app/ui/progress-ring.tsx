@@ -2,11 +2,13 @@ export function ProgressRing({
   value,
   max,
   label,
+  of,
   caption,
 }: {
   value: number;
   max: number;
   label: string;
+  of?: number;
   caption: string;
 }) {
   const pct = max <= 0 ? 0 : Math.min(1, value / max);
@@ -15,7 +17,12 @@ export function ProgressRing({
   const dash = circumference * pct;
 
   return (
-    <div className="relative flex flex-1 flex-col items-center justify-center rounded-[28px] bg-card px-4 py-5 shadow-[var(--shadow-card)]">
+    <div
+      className="relative flex flex-1 flex-col items-center justify-center rounded-[28px] bg-card px-4 py-5 shadow-[var(--shadow-card)]"
+      aria-label={
+        of == null ? `${label} ${caption}` : `${label} of ${of} ${caption}`
+      }
+    >
       <div className="relative grid place-items-center">
         <svg
           viewBox="0 0 100 100"
@@ -41,13 +48,22 @@ export function ProgressRing({
             strokeDasharray={`${dash} ${circumference}`}
           />
         </svg>
-        <span
-          className={`absolute font-semibold tabular-nums ${
-            label.length > 3 ? "text-base" : "text-xl"
-          }`}
-        >
-          {label}
-        </span>
+        {of == null ? (
+          <span
+            className={`absolute font-semibold tabular-nums ${
+              label.length > 3 ? "text-base" : "text-xl"
+            }`}
+          >
+            {label}
+          </span>
+        ) : (
+          <span className="absolute flex flex-col items-center leading-none">
+            <span className="text-xl font-semibold tabular-nums">{label}</span>
+            <span className="mt-1 text-[11px] font-medium text-muted">
+              of {of}
+            </span>
+          </span>
+        )}
       </div>
       <p className="mt-1 text-sm font-medium text-muted">{caption}</p>
     </div>

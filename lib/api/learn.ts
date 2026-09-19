@@ -28,6 +28,7 @@ export type LearnUserResponse = {
   } | null;
   enrollments?: Enrollment[];
   totalPoints?: number;
+  targetPoints?: number;
   error?: string;
 };
 

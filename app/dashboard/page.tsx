@@ -130,6 +130,8 @@ export default async function DashboardPage() {
   const enrollments = learnUser?.enrollments ?? [];
   const totalPoints =
     typeof learnUser?.totalPoints === "number" ? learnUser.totalPoints : 0;
+  const targetPoints =
+    typeof learnUser?.targetPoints === "number" ? learnUser.targetPoints : 0;
   const name = session.user.name || "there";
   const done = enrollments.filter((enrollment) =>
     isSubmittedProgress(enrollment.progressStatus)
@@ -235,8 +237,9 @@ export default async function DashboardPage() {
                 />
                 <ProgressRing
                   value={totalPoints}
-                  max={Math.max(totalPoints, 1)}
+                  max={Math.max(targetPoints, 1)}
                   label={String(totalPoints)}
+                  of={targetPoints > 0 ? targetPoints : undefined}
                   caption={totalPoints === 1 ? "Point" : "Points"}
                 />
               </div>
