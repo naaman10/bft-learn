@@ -131,6 +131,13 @@ export async function proxyNeonAuthRequest(
       : Buffer.from(await request.arrayBuffer());
   const body = rawBody && rawBody.length > 0 ? rawBody : undefined;
 
+  console.log("[auth-proxy] Forwarding request", {
+    path: path.join("/"),
+    method: request.method,
+    origin,
+    userAgent: request.headers.get("user-agent")?.substring(0, 50),
+  });
+
   const upstream = await proxyRequest(
     url,
     request.method,
@@ -140,11 +147,15 @@ export async function proxyNeonAuthRequest(
   const responseBody = await readIncomingBody(upstream);
   const status = upstream.statusCode ?? 502;
 
-  if (status === 403) {
+  if (status === 401 || status === 403) {
     console.error("[auth-proxy] Neon Auth rejected the request", {
       path: path.join("/"),
       origin,
       status,
+      message:
+        status === 401
+          ? "Unauthorized - Check that the origin is allowlisted in Neon Auth"
+          : "Forbidden - Origin mismatch or CORS issue",
     });
   }
 
