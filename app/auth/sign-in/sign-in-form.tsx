@@ -31,6 +31,16 @@ export function SignInForm({ initialError }: { initialError?: string }) {
     }
 
     try {
+      // Log exact values being sent
+      console.log("[sign-in] Request details", {
+        email,
+        emailLength: email.length,
+        emailCharCodes: Array.from(email).map((c) => c.charCodeAt(0)),
+        passwordLength: password.length,
+        hasLeadingSpace: email[0] === " ",
+        hasTrailingSpace: email[email.length - 1] === " ",
+      });
+
       // Use direct fetch with explicit credentials handling for mobile Safari compatibility
       const response = await fetch("/api/auth/sign-in/email", {
         method: "POST",
