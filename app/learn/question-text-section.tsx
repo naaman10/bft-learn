@@ -74,17 +74,20 @@ export function QuestionTextSection({
     typeof savedAnswer === "string" ? savedAnswer : "";
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+    <div className="flex flex-1 flex-col gap-4">
       {question ? (
         <FieldText
           value={question}
-          className="max-w-2xl text-3xl font-semibold tracking-tight"
+          className="text-2xl font-semibold leading-snug tracking-tight sm:text-3xl"
         />
       ) : (
         <p className="text-muted">This question has no text yet.</p>
       )}
       {help && (
-        <FieldText value={help} className="max-w-xl text-sm text-muted" />
+        <FieldText
+          value={help}
+          className="rounded-2xl bg-accent-soft/70 px-4 py-3 text-sm text-foreground/80"
+        />
       )}
       <label className="sr-only" htmlFor={`answer-${section.entryId ?? "question"}`}>
         Your answer
@@ -94,8 +97,8 @@ export function QuestionTextSection({
         name="answer"
         defaultValue={defaultAnswer}
         rows={8}
-        placeholder="Type your answer"
-        className="mt-4 min-h-40 w-full resize-y rounded-lg border border-border bg-background px-4 py-3 text-left text-lg text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
+        placeholder="Write your answer here…"
+        className="mt-1 min-h-40 w-full resize-y rounded-[22px] border border-border bg-background px-4 py-3.5 text-left text-lg leading-relaxed text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
       />
     </div>
   );

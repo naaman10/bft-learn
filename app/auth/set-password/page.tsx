@@ -18,7 +18,10 @@ export default async function SetPasswordPage() {
   }
 
   return (
-    <AuthShell title="Set your password">
+    <AuthShell
+      title="Pick a password"
+      subtitle="You'll use this next time you come back."
+    >
       <SetPasswordForm email={session.user.email} />
     </AuthShell>
   );

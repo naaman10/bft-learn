@@ -27,6 +27,7 @@ export type LearnUserResponse = {
     role: string;
   } | null;
   enrollments?: Enrollment[];
+  totalPoints?: number;
   error?: string;
 };
 
@@ -144,6 +145,23 @@ export function progressLabel(status: string) {
       return "Assessed";
     default:
       return status.replaceAll("_", " ");
+  }
+}
+
+export function kidProgressLabel(status: string) {
+  switch (status) {
+    case "not_started":
+      return "Ready to start";
+    case "in_progress":
+      return "Keep going";
+    case "completed":
+      return "Finished";
+    case "to_assess":
+      return "Sent to your tutor";
+    case "assessed":
+      return "Marked";
+    default:
+      return progressLabel(status);
   }
 }
 

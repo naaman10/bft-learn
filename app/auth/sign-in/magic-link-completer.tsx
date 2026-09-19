@@ -61,5 +61,5 @@ export function MagicLinkCompleter({ verifier }: { verifier: string }) {
     return <SignInForm initialError={error} />;
   }
 
-  return <p className="text-center text-sm text-muted">Signing you in…</p>;
+  return <p className="text-center text-base text-muted">Signing you in…</p>;
 }

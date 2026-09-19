@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { National_Park } from "next/font/google";
 import "./globals.css";
 
@@ -35,6 +35,13 @@ export const metadata: Metadata = {
     ],
   },
   manifest: "/favicons/site.webmanifest",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f6f4ef",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

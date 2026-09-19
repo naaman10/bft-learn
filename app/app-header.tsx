@@ -1,18 +1,66 @@
 import { signOut } from "@/app/dashboard/actions";
+import { SignOutIcon } from "@/app/ui/icons";
 
-export function AppHeader() {
-  return (
-    <header className="flex items-center justify-between border-b border-border bg-card px-6 py-4">
-      <img src="/bft-learn-logo.png" alt="BFT Learn Logo" className="h-8" />
-
+export function SignOutButton({
+  variant = "text",
+}: {
+  variant?: "text" | "icon";
+}) {
+  if (variant === "icon") {
+    return (
       <form action={signOut}>
         <button
           type="submit"
-          className="rounded-lg border border-border px-3 py-1.5 text-sm font-medium text-muted hover:bg-background"
+          aria-label="Sign out"
+          className="grid h-11 w-11 place-items-center rounded-full bg-card text-muted shadow-[var(--shadow-card)] hover:text-foreground"
         >
-          Sign out
+          <SignOutIcon className="h-5 w-5" />
         </button>
       </form>
+    );
+  }
+
+  return (
+    <form action={signOut}>
+      <button
+        type="submit"
+        className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted hover:bg-background hover:text-foreground"
+      >
+        Sign out
+      </button>
+    </form>
+  );
+}
+
+export function DesktopBrandBar() {
+  return (
+    <header className="hidden md:block">
+      <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-8 py-5">
+        <img src="/bft-learn-logo.png" alt="BFT Learn" className="h-8" />
+        <SignOutButton />
+      </div>
     </header>
   );
+}
+
+export function InitialsAvatar({ name }: { name: string }) {
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+
+  return (
+    <div
+      aria-hidden="true"
+      className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-accent text-sm font-semibold text-white shadow-[0_8px_18px_rgba(247,80,116,0.28)]"
+    >
+      {initials || "B"}
+    </div>
+  );
+}
+
+export function firstName(name: string) {
+  return name.trim().split(/\s+/).filter(Boolean)[0] || "there";
 }

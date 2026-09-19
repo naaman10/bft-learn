@@ -19,7 +19,10 @@ export default async function SignInPage({
 
   if (verifier) {
     return (
-      <AuthShell title="Sign in to your account">
+      <AuthShell
+        title="Welcome back"
+        subtitle="Finishing your sign-in…"
+      >
         <MagicLinkCompleter verifier={verifier} />
       </AuthShell>
     );
@@ -28,7 +31,10 @@ export default async function SignInPage({
   await redirectAuthenticatedUser();
 
   return (
-    <AuthShell title="Sign in to your account">
+    <AuthShell
+      title="Welcome back"
+      subtitle="Sign in to jump into your learning."
+    >
       <SignInForm />
     </AuthShell>
   );

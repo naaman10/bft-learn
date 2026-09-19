@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/server";
 import { hasCredentialAccount } from "@/lib/auth/accounts";
@@ -6,9 +7,10 @@ import {
   getCourseSections,
   getLearnContent,
   isSubmittedProgress,
-  progressLabel,
+  kidProgressLabel,
 } from "@/lib/api/learn";
-import { AppHeader } from "@/app/app-header";
+import { AppShell } from "@/app/app-shell";
+import { ChevronLeftIcon, ChevronRightIcon } from "@/app/ui/icons";
 import {
   CompleteButton,
   CompleteContentForm,
@@ -29,6 +31,26 @@ function contentErrorMessage(status: number) {
     default:
       return "This course could not be loaded.";
   }
+}
+
+function CircleLink({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-card text-foreground shadow-[var(--shadow-card)] ring-1 ring-border hover:bg-background"
+    >
+      {children}
+    </Link>
+  );
 }
 
 export default async function LearnSectionPage({
@@ -64,9 +86,13 @@ export default async function LearnSectionPage({
     sectionValid && sections.length > 0 && sectionIndex === sections.length - 1;
   const submitted = result.ok && isSubmittedProgress(result.data.progressStatus);
   const canComplete = Boolean(isLastSection && !submitted);
+  const progressPercent =
+    sections.length === 0
+      ? 0
+      : Math.round(((sectionValid ? sectionIndex + 1 : 0) / sections.length) * 100);
 
   const sectionCard = (
-    <div className="flex flex-1 flex-col rounded-2xl border border-border bg-card p-8 shadow-sm">
+    <div className="flex min-h-[18rem] flex-1 flex-col rounded-[28px] bg-card p-5 shadow-[var(--shadow-card)] sm:p-8">
       {!section ? (
         <p className="text-muted">This section could not be found.</p>
       ) : section.contentType === "infoSection" ? (
@@ -88,81 +114,107 @@ export default async function LearnSectionPage({
 
   const sectionNav =
     sections.length > 0 ? (
-      <nav className="flex items-center justify-between gap-4">
-        {sectionValid && sectionIndex > 0 ? (
-          <Link
-            href={`/learn/${contentId}/${sectionIndex - 1}`}
-            className="text-sm font-medium text-accent hover:text-accent-hover"
-          >
-            Previous
-          </Link>
-        ) : (
-          <span />
-        )}
-        <p className="text-sm text-muted">
-          {sectionValid ? sectionIndex + 1 : 0} of {sections.length}
-        </p>
-        {sectionValid && sectionIndex < sections.length - 1 ? (
-          <Link
-            href={`/learn/${contentId}/${sectionIndex + 1}`}
-            className="text-sm font-medium text-accent hover:text-accent-hover"
-          >
-            Next
-          </Link>
-        ) : canComplete ? (
-          <CompleteButton />
-        ) : isLastSection && submitted ? (
-          <span className="text-sm font-medium text-muted">Completed</span>
-        ) : (
-          <span />
-        )}
+      <nav className="fixed inset-x-0 bottom-0 z-20 px-5 pb-[max(0.9rem,env(safe-area-inset-bottom))] pt-2 md:static md:px-0 md:pb-0 md:pt-0">
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 rounded-full bg-card/95 p-1.5 shadow-[0_12px_40px_rgba(28,25,23,0.12)] ring-1 ring-border backdrop-blur md:bg-transparent md:p-0 md:shadow-none md:ring-0 md:backdrop-blur-none">
+          {sectionValid && sectionIndex > 0 ? (
+            <Link
+              href={`/learn/${contentId}/${sectionIndex - 1}`}
+              className="inline-flex min-h-12 items-center gap-1 rounded-full bg-background px-4 text-sm font-semibold text-foreground hover:bg-white md:bg-card md:shadow-[var(--shadow-card)] md:ring-1 md:ring-border"
+            >
+              <ChevronLeftIcon className="h-4 w-4" />
+              Back
+            </Link>
+          ) : (
+            <span className="min-h-12 min-w-12" />
+          )}
+          <p className="text-sm font-medium text-muted">
+            {sectionValid ? sectionIndex + 1 : 0} of {sections.length}
+          </p>
+          {sectionValid && sectionIndex < sections.length - 1 ? (
+            <Link
+              href={`/learn/${contentId}/${sectionIndex + 1}`}
+              className="inline-flex min-h-12 items-center gap-1 rounded-full bg-accent px-4 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(247,80,116,0.28)] hover:bg-accent-hover"
+            >
+              Next
+              <ChevronRightIcon className="h-4 w-4" />
+            </Link>
+          ) : canComplete ? (
+            <CompleteButton />
+          ) : isLastSection && submitted ? (
+            <span className="rounded-full bg-accent-soft px-4 py-3 text-sm font-semibold text-accent">
+              All done
+            </span>
+          ) : (
+            <span className="min-h-12 min-w-12" />
+          )}
+        </div>
       </nav>
     ) : null;
 
-  return (
-    <main className="flex min-h-full flex-1 flex-col">
-      <AppHeader />
+  const title = result.ok
+    ? result.data.content.name.trim() ||
+      result.data.content.entryName.trim() ||
+      "Assigned work"
+    : "Unable to open course";
 
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
-        <Link
-          href="/dashboard"
-          className="self-start text-sm font-medium text-accent hover:text-accent-hover"
-        >
-          Back to dashboard
-        </Link>
+  return (
+    <AppShell current="learn" learnHref={`/learn/${contentId}`}>
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-5 px-5 py-4 pb-[5.75rem] md:px-8 md:py-2 md:pb-8">
+        <div className="flex items-center gap-3">
+          <CircleLink href="/dashboard" label="Back to home">
+            <ChevronLeftIcon className="h-5 w-5" />
+          </CircleLink>
+          <h1 className="min-w-0 flex-1 text-lg font-semibold leading-snug tracking-tight md:text-xl">
+            {title}
+          </h1>
+        </div>
 
         {!result.ok ? (
-          <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Unable to open course
-            </h1>
-            <p className="mt-2 text-muted">
-              {contentErrorMessage(result.status)}
-            </p>
+          <div className="rounded-[28px] bg-card p-8 text-center shadow-[var(--shadow-card)]">
+            <p className="text-muted">{contentErrorMessage(result.status)}</p>
+            <Link
+              href="/dashboard"
+              className="mt-6 inline-flex min-h-12 items-center rounded-full bg-accent px-5 text-sm font-semibold text-white hover:bg-accent-hover"
+            >
+              Back to home
+            </Link>
           </div>
         ) : (
           <>
             <div className="flex flex-col gap-3">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <h1 className="text-2xl font-semibold tracking-tight">
-                  {result.data.content.name.trim() ||
-                    result.data.content.entryName.trim() ||
-                    "Assigned work"}
-                </h1>
-                <span className="shrink-0 rounded-full border border-border bg-card px-2.5 py-0.5 text-xs font-medium text-muted capitalize">
-                  {progressLabel(result.data.progressStatus)}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-white">
+                  {kidProgressLabel(result.data.progressStatus)}
                 </span>
-              </div>
-              <p className="text-sm text-muted">
                 {[
-                  result.data.content.type,
                   result.data.content.subject,
-                  result.data.content.ageGroup,
                   result.data.content.stage,
+                  result.data.content.ageGroup,
                 ]
                   .filter((value) => value?.trim())
-                  .join(" · ")}
-              </p>
+                  .map((value) => (
+                    <span
+                      key={value}
+                      className="rounded-full bg-card px-3 py-1 text-xs font-medium text-muted shadow-[var(--shadow-card)]"
+                    >
+                      {value}
+                    </span>
+                  ))}
+              </div>
+              {sections.length > 0 ? (
+                <div>
+                  <div className="mb-2 flex items-center justify-between text-sm">
+                    <span className="font-medium">Learning progress</span>
+                    <span className="text-muted">{progressPercent}%</span>
+                  </div>
+                  <div className="h-2.5 overflow-hidden rounded-full bg-accent-soft">
+                    <div
+                      className="h-full rounded-full bg-accent"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             {canComplete ? (
@@ -181,7 +233,7 @@ export default async function LearnSectionPage({
             )}
           </>
         )}
-      </div>
-    </main>
+      </main>
+    </AppShell>
   );
 }

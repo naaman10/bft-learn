@@ -23,7 +23,7 @@ export function CompleteContentForm({
       {state?.error ? (
         <p
           role="alert"
-          className="rounded-lg bg-error-bg px-3 py-2 text-sm text-error"
+          className="rounded-2xl bg-error-bg px-4 py-3 text-sm text-error"
         >
           {state.error}
         </p>
@@ -39,7 +39,7 @@ export function CompleteButton() {
     <button
       type="submit"
       disabled={pending}
-      className="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-white hover:bg-accent-hover disabled:opacity-60"
+      className="inline-flex min-h-12 items-center rounded-full bg-accent px-5 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(247,80,116,0.28)] hover:bg-accent-hover disabled:opacity-60"
     >
       {pending ? "Completing…" : "Complete"}
     </button>

@@ -117,7 +117,7 @@ function ContentfulImage({
       alt={alt}
       width={width}
       height={height}
-      className="my-6 h-auto w-full rounded-lg"
+      className="my-6 h-auto w-full rounded-2xl"
     />
   );
 }
@@ -178,7 +178,7 @@ export function InfoSection({ section }: { section: CourseSection }) {
           ),
           [BLOCKS.LIST_ITEM]: (_node, children) => <li>{children}</li>,
           [BLOCKS.QUOTE]: (_node, children) => (
-            <blockquote className="mb-4 border-l-2 border-accent pl-4 text-muted">
+            <blockquote className="mb-4 rounded-2xl bg-accent-soft/70 px-4 py-3 text-muted">
               {children}
             </blockquote>
           ),

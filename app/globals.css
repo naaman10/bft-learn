@@ -7,10 +7,19 @@
   --muted: #57534e;
   --accent: #f75074;
   --accent-hover: #e03d61;
+  --accent-soft: #fde8ee;
   --ring: #fbb6c5;
   --border: #e7e5e4;
   --error: #b91c1c;
   --error-bg: #fef2f2;
+  --peach: #fff1d6;
+  --lavender: #efe7ff;
+  --mint: #e4f6ee;
+  --shadow-card: 0 10px 30px rgba(28, 25, 23, 0.06);
+}
+
+.hero-banner {
+  background: linear-gradient(135deg, #fde8ee 0%, #fff7f2 52%, #fff1d6 100%);
 }
 
 @theme inline {
@@ -20,16 +29,40 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
   --color-ring: var(--ring);
   --color-border: var(--border);
   --color-error: var(--error);
   --color-error-bg: var(--error-bg);
+  --color-peach: var(--peach);
+  --color-lavender: var(--lavender);
+  --color-mint: var(--mint);
   --font-sans: var(--font-national-park);
   --font-mono: var(--font-national-park);
 }
 
+html {
+  min-height: 100%;
+}
+
 body {
-  background: var(--background);
+  min-height: 100%;
+  background-color: var(--background);
+  background-image:
+    radial-gradient(ellipse 90% 50% at 110% -8%, #fde8ee 0%, transparent 55%),
+    radial-gradient(ellipse 70% 40% at -15% 8%, #fff3d1 0%, transparent 50%),
+    radial-gradient(ellipse 50% 30% at 50% 120%, #fde8ee 0%, transparent 60%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-national-park), ui-sans-serif, system-ui, sans-serif;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+}
+
+a,
+button {
+  touch-action: manipulation;
 }

@@ -213,7 +213,7 @@ export function SetPasswordForm({ email }: { email: string }) {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               placeholder="At least 8 characters"
-              className="block w-full rounded-lg border border-border bg-white px-3 py-2 text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
+              className="block min-h-12 w-full rounded-2xl border border-border bg-background px-4 py-3 text-base text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
             />
           </div>
 
@@ -234,7 +234,7 @@ export function SetPasswordForm({ email }: { email: string }) {
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
               placeholder="••••••••"
-              className="block w-full rounded-lg border border-border bg-white px-3 py-2 text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
+              className="block min-h-12 w-full rounded-2xl border border-border bg-background px-4 py-3 text-base text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
             />
           </div>
         </>
@@ -260,7 +260,7 @@ export function SetPasswordForm({ email }: { email: string }) {
               value={otp}
               onChange={(event) => setOtp(event.target.value)}
               placeholder="123456"
-              className="block w-full rounded-lg border border-border bg-white px-3 py-2 tracking-widest text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
+              className="block min-h-12 w-full rounded-2xl border border-border bg-background px-4 py-3 tracking-widest text-base text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
             />
           </div>
 
@@ -278,7 +278,7 @@ export function SetPasswordForm({ email }: { email: string }) {
       {error && (
         <p
           role="alert"
-          className="rounded-lg bg-error-bg px-3 py-2 text-sm text-error"
+          className="rounded-2xl bg-error-bg px-4 py-3 text-sm text-error"
         >
           {error}
         </p>
@@ -287,7 +287,7 @@ export function SetPasswordForm({ email }: { email: string }) {
       <button
         type="submit"
         disabled={isPending}
-        className="flex w-full justify-center rounded-lg bg-accent px-3 py-2.5 text-sm font-semibold text-white hover:bg-accent-hover disabled:opacity-60"
+        className="flex min-h-12 w-full items-center justify-center rounded-full bg-accent px-4 text-base font-semibold text-white hover:bg-accent-hover disabled:opacity-60"
       >
         {isPending
           ? step === "password"

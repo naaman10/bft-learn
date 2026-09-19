@@ -53,7 +53,7 @@ export function SignInForm({ initialError }: { initialError?: string }) {
           autoComplete="email"
           required
           placeholder="you@example.com"
-          className="block w-full rounded-lg border border-border bg-white px-3 py-2 text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
+          className="block min-h-12 w-full rounded-2xl border border-border bg-background px-4 py-3 text-base text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
         />
       </div>
 
@@ -71,14 +71,14 @@ export function SignInForm({ initialError }: { initialError?: string }) {
           autoComplete="current-password"
           required
           placeholder="••••••••"
-          className="block w-full rounded-lg border border-border bg-white px-3 py-2 text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
+          className="block min-h-12 w-full rounded-2xl border border-border bg-background px-4 py-3 text-base text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
         />
       </div>
 
       {error && (
         <p
           role="alert"
-          className="rounded-lg bg-error-bg px-3 py-2 text-sm text-error"
+          className="rounded-2xl bg-error-bg px-4 py-3 text-sm text-error"
         >
           {error}
         </p>
@@ -87,7 +87,7 @@ export function SignInForm({ initialError }: { initialError?: string }) {
       <button
         type="submit"
         disabled={isPending}
-        className="flex w-full justify-center rounded-lg bg-accent px-3 py-2.5 text-sm font-semibold text-white hover:bg-accent-hover disabled:opacity-60"
+        className="flex min-h-12 w-full items-center justify-center rounded-full bg-accent px-4 text-base font-semibold text-white hover:bg-accent-hover disabled:opacity-60"
       >
         {isPending ? "Signing in…" : "Sign in"}
       </button>
