@@ -2,7 +2,6 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth/client";
 
 export function SignInForm({ initialError }: { initialError?: string }) {
   const router = useRouter();
@@ -31,27 +30,43 @@ export function SignInForm({ initialError }: { initialError?: string }) {
       return;
     }
 
-    const { error: signInError } = await authClient.signIn.email({
-      email,
-      password,
-    });
-
-    if (signInError) {
-      console.error("[sign-in] Authentication failed", {
-        message: signInError.message,
-        code: (signInError as any).code,
-        status: (signInError as any).status,
-        email,
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent,
+    try {
+      // Use direct fetch with explicit credentials handling for mobile Safari compatibility
+      const response = await fetch("/api/auth/sign-in/email", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
-      setError(signInError.message || "Failed to sign in. Try again.");
-      setIsPending(false);
-      return;
-    }
 
-    router.replace("/dashboard");
-    router.refresh();
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        console.error("[sign-in] Authentication failed", {
+          status: response.status,
+          statusText: response.statusText,
+          data,
+          email,
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent,
+        });
+        throw new Error(
+          data?.message || data?.error || "Failed to sign in. Try again."
+        );
+      }
+
+      console.log("[sign-in] Authentication successful");
+      router.replace("/dashboard");
+      router.refresh();
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to sign in. Try again.";
+      console.error("[sign-in] Sign-in error:", err);
+      setError(errorMessage);
+      setIsPending(false);
+    }
   }
 
   return (
