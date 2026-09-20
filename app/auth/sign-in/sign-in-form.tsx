@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 
 export function SignInForm({ initialError }: { initialError?: string }) {
-  const router = useRouter();
   const [error, setError] = useState(initialError ?? "");
   const [isPending, setIsPending] = useState(false);
 
@@ -68,8 +66,7 @@ export function SignInForm({ initialError }: { initialError?: string }) {
       }
 
       console.log("[sign-in] Authentication successful");
-      router.replace("/dashboard");
-      router.refresh();
+      window.location.replace("/dashboard");
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to sign in. Try again.";

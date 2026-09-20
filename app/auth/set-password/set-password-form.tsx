@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { sendPasswordSetupOtp } from "./actions";
 
@@ -99,7 +98,6 @@ async function resetPasswordWithRetry(
 }
 
 export function SetPasswordForm({ email }: { email: string }) {
-  const router = useRouter();
   const [step, setStep] = useState<"password" | "otp">("password");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -150,8 +148,7 @@ export function SetPasswordForm({ email }: { email: string }) {
       });
 
       if (!signInError) {
-        router.replace("/dashboard");
-        router.refresh();
+        window.location.replace("/dashboard");
         return;
       }
 
@@ -160,8 +157,7 @@ export function SetPasswordForm({ email }: { email: string }) {
           "[set-password] Password set but sign-in failed",
           signInError
         );
-        router.replace("/auth/sign-in");
-        router.refresh();
+        window.location.replace("/auth/sign-in");
         return;
       }
 
