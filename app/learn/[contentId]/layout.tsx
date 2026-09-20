@@ -3,7 +3,9 @@ import { getSession } from "@/lib/auth/session";
 import { hasCredentialAccount } from "@/lib/auth/accounts";
 import {
   getCourseReferenceMaterial,
+  getCourseSections,
   getLearnContent,
+  kidProgressLabel,
   referenceTabLabel,
 } from "@/lib/api/learn";
 import { AppShell } from "@/app/app-shell";
@@ -42,11 +44,32 @@ export default async function LearnContentLayout({
       variant="reference"
     />
   ));
+  const title = result.ok
+    ? result.data.content.name.trim() ||
+      result.data.content.entryName.trim() ||
+      "Assigned work"
+    : "Unable to open course";
+  const tags = result.ok
+    ? [
+        result.data.content.subject,
+        result.data.content.stage,
+        result.data.content.ageGroup,
+      ].filter((value) => value?.trim())
+    : [];
+  const sectionCount = result.ok
+    ? getCourseSections(result.data).length
+    : 0;
 
   return (
     <AppShell>
       <LearnCourseFrame
         contentId={contentId}
+        title={title}
+        progressLabel={
+          result.ok ? kidProgressLabel(result.data.progressStatus) : null
+        }
+        tags={tags}
+        sectionCount={sectionCount}
         referenceTabs={referenceTabs}
         referencePanels={referencePanels}
       >

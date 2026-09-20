@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { hasCredentialAccount } from "@/lib/auth/accounts";
@@ -7,7 +6,6 @@ import {
   getCourseSections,
   getLearnContent,
   isSubmittedProgress,
-  kidProgressLabel,
 } from "@/lib/api/learn";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/app/ui/icons";
 import {
@@ -29,26 +27,6 @@ function contentErrorMessage(status: number) {
     default:
       return "This course could not be loaded.";
   }
-}
-
-function CircleLink({
-  href,
-  label,
-  children,
-}: {
-  href: string;
-  label: string;
-  children: ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-label={label}
-      className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-card text-foreground shadow-[var(--shadow-card)] ring-1 ring-border hover:bg-background"
-    >
-      {children}
-    </Link>
-  );
 }
 
 export default async function LearnSectionPage({
@@ -84,13 +62,9 @@ export default async function LearnSectionPage({
     sectionValid && sections.length > 0 && sectionIndex === sections.length - 1;
   const submitted = result.ok && isSubmittedProgress(result.data.progressStatus);
   const canComplete = Boolean(isLastSection && !submitted);
-  const progressPercent =
-    sections.length === 0
-      ? 0
-      : Math.round(((sectionValid ? sectionIndex + 1 : 0) / sections.length) * 100);
 
   const sectionCard = (
-    <div className="flex min-h-[18rem] flex-1 flex-col rounded-[28px] bg-card p-5 shadow-[var(--shadow-card)] sm:p-8">
+    <div className="flex h-full min-h-0 min-h-[18rem] flex-1 flex-col rounded-[28px] bg-card p-5 shadow-[var(--shadow-card)] sm:p-8">
       <SectionBody
         section={section}
         savedAnswer={
@@ -141,23 +115,8 @@ export default async function LearnSectionPage({
       </nav>
     ) : null;
 
-  const title = result.ok
-    ? result.data.content.name.trim() ||
-      result.data.content.entryName.trim() ||
-      "Assigned work"
-    : "Unable to open course";
-
   return (
-    <main className="flex min-h-0 w-full flex-1 flex-col gap-5">
-      <div className="flex items-center gap-3">
-        <CircleLink href="/dashboard" label="Back to home">
-          <ChevronLeftIcon className="h-5 w-5" />
-        </CircleLink>
-        <h1 className="min-w-0 flex-1 text-lg font-semibold leading-snug tracking-tight md:text-xl">
-          {title}
-        </h1>
-      </div>
-
+    <main className="flex h-full min-h-0 w-full flex-1 flex-col gap-5">
       {!result.ok ? (
         <div className="rounded-[28px] bg-card p-8 text-center shadow-[var(--shadow-card)]">
           <p className="text-muted">{contentErrorMessage(result.status)}</p>
@@ -168,58 +127,15 @@ export default async function LearnSectionPage({
             Back to home
           </Link>
         </div>
+      ) : canComplete ? (
+        <CompleteContentForm contentId={contentId} itemId={section?.entryId}>
+          {sectionCard}
+          {sectionNav}
+        </CompleteContentForm>
       ) : (
         <>
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-white">
-                {kidProgressLabel(result.data.progressStatus)}
-              </span>
-              {[
-                result.data.content.subject,
-                result.data.content.stage,
-                result.data.content.ageGroup,
-              ]
-                .filter((value) => value?.trim())
-                .map((value) => (
-                  <span
-                    key={value}
-                    className="rounded-full bg-card px-3 py-1 text-xs font-medium text-muted shadow-[var(--shadow-card)]"
-                  >
-                    {value}
-                  </span>
-                ))}
-            </div>
-            {sections.length > 0 ? (
-              <div>
-                <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="font-medium">Learning progress</span>
-                  <span className="text-muted">{progressPercent}%</span>
-                </div>
-                <div className="h-2.5 overflow-hidden rounded-full bg-accent-soft">
-                  <div
-                    className="h-full rounded-full bg-accent"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-              </div>
-            ) : null}
-          </div>
-
-          {canComplete ? (
-            <CompleteContentForm
-              contentId={contentId}
-              itemId={section?.entryId}
-            >
-              {sectionCard}
-              {sectionNav}
-            </CompleteContentForm>
-          ) : (
-            <>
-              {sectionCard}
-              {sectionNav}
-            </>
-          )}
+          {sectionCard}
+          {sectionNav}
         </>
       )}
     </main>
