@@ -64,7 +64,7 @@ export default async function LearnSectionPage({
   const canComplete = Boolean(isLastSection && !submitted);
 
   const sectionCard = (
-    <div className="flex h-full min-h-0 min-h-[18rem] flex-1 flex-col rounded-[28px] bg-card p-5 shadow-[var(--shadow-card)] sm:p-8">
+    <div className="flex h-full min-h-[18rem] flex-1 flex-col rounded-[28px] bg-card p-5 shadow-[var(--shadow-card)] sm:p-8 md:col-start-2 md:row-start-2 md:h-full md:min-h-0 md:overflow-y-auto">
       <SectionBody
         section={section}
         savedAnswer={
@@ -78,7 +78,7 @@ export default async function LearnSectionPage({
 
   const sectionNav =
     sections.length > 0 ? (
-      <nav className="fixed inset-x-0 bottom-0 z-20 px-5 pb-[max(0.9rem,env(safe-area-inset-bottom))] pt-2 md:static md:px-0 md:pb-0 md:pt-0">
+      <nav className="fixed inset-x-0 bottom-0 z-20 px-5 pb-[max(0.9rem,env(safe-area-inset-bottom))] pt-2 md:static md:col-start-2 md:row-start-3 md:px-0 md:pb-5 md:pt-0">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 rounded-full bg-card/95 p-1.5 shadow-[0_12px_40px_rgba(28,25,23,0.12)] ring-1 ring-border backdrop-blur md:max-w-none md:bg-transparent md:p-0 md:shadow-none md:ring-0 md:backdrop-blur-none">
           {sectionValid && sectionIndex > 0 ? (
             <Link
@@ -116,7 +116,7 @@ export default async function LearnSectionPage({
     ) : null;
 
   return (
-    <main className="flex h-full min-h-0 w-full flex-1 flex-col gap-5">
+    <main className="contents">
       {!result.ok ? (
         <div className="rounded-[28px] bg-card p-8 text-center shadow-[var(--shadow-card)]">
           <p className="text-muted">{contentErrorMessage(result.status)}</p>

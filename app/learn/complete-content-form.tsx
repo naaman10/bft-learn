@@ -16,9 +16,11 @@ export function CompleteContentForm({
   const [state, formAction] = useActionState(completeContent, null);
 
   return (
-    <form action={formAction} className="flex h-full min-h-0 flex-1 flex-col gap-5">
-      <input type="hidden" name="contentId" value={contentId} />
-      {itemId ? <input type="hidden" name="itemId" value={itemId} /> : null}
+    <form action={formAction} className="contents">
+      <div className="hidden">
+        <input type="hidden" name="contentId" value={contentId} />
+        {itemId ? <input type="hidden" name="itemId" value={itemId} /> : null}
+      </div>
       {children}
       {state?.error ? (
         <p

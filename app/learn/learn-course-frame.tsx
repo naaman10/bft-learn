@@ -108,17 +108,15 @@ export function LearnCourseFrame({
 
   if (split) {
     return (
-      <div className="mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 px-5 py-4 pb-[5.75rem] md:h-[calc(100dvh-4.5rem)] md:grid-cols-2 md:grid-rows-[auto_minmax(0,1fr)] md:gap-x-6 md:gap-y-5 md:overflow-hidden md:px-8 md:py-3 md:pb-8">
-        <div className="md:col-start-1 md:row-start-1 md:px-3 md:pt-2">
+      <div className="learn-split mx-auto grid w-full max-w-6xl flex-1 grid-cols-1 px-5 py-4 pb-[5.75rem] md:h-[calc(100dvh-4.5rem)] md:grid-cols-2 md:grid-rows-[auto_minmax(0,1fr)_auto] md:gap-x-6 md:gap-y-5 md:overflow-hidden md:px-8 md:py-3 md:pb-8">
+        <div className="md:col-start-1 md:row-start-1 md:pt-2">
           {header}
         </div>
-        <div className="min-h-0 md:col-start-1 md:row-start-2 md:px-3 md:pb-5">
+        <div className="flex h-full min-h-0 w-full min-w-0 flex-col md:col-start-1 md:row-start-2">
           {referencePanel}
         </div>
-        <div className="relative flex min-h-0 min-w-0 flex-col md:col-start-2 md:row-start-2 md:overflow-y-auto md:px-3 md:pb-5">
-          {children}
-          {fab}
-        </div>
+        {children}
+        {fab}
       </div>
     );
   }
@@ -133,7 +131,7 @@ export function LearnCourseFrame({
       ) : (
         header
       )}
-      <div className="relative flex min-h-0 min-w-0 flex-col">
+      <div className="relative flex min-h-0 min-w-0 flex-col gap-5">
         {children}
       </div>
     </div>

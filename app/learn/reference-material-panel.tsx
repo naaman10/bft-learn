@@ -87,8 +87,8 @@ export function ReferenceMaterialPanel({
   const panelClassName = !visible
     ? "hidden"
     : overlayOpen
-      ? "fixed inset-0 z-40 flex flex-col bg-background md:static md:z-auto md:h-full md:min-h-0 md:rounded-[28px] md:bg-card md:shadow-[var(--shadow-card)]"
-      : "hidden md:flex md:h-full md:min-h-0 md:flex-col md:rounded-[28px] md:bg-card md:shadow-[var(--shadow-card)]";
+      ? "fixed inset-0 z-40 flex flex-col bg-background md:static md:z-auto md:h-full md:min-h-0 md:w-full md:rounded-[28px] md:bg-card md:shadow-[var(--shadow-card)]"
+      : "hidden md:flex md:h-full md:min-h-0 md:w-full md:flex-col md:rounded-[28px] md:bg-card md:shadow-[var(--shadow-card)]";
 
   useEffect(() => {
     const restoreKey = `${contentId}:${activeEntryId}:${String(visible)}:${String(overlayOpen)}`;
