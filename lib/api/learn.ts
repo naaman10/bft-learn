@@ -108,16 +108,19 @@ function sectionEntryId(section: Record<string, unknown>, index: number) {
   return String(index);
 }
 
-export function getCourseSections(data: LearnContentResponse): CourseSection[] {
+function getCourseEntries(
+  data: LearnContentResponse,
+  fieldName: string
+): CourseSection[] {
   const fields = asRecord(data.content.fields);
-  const sections = fields?.sections;
+  const entries = fields?.[fieldName];
 
-  if (!Array.isArray(sections)) {
+  if (!Array.isArray(entries)) {
     return [];
   }
 
-  return sections.flatMap((section, index) => {
-    const record = asRecord(section);
+  return entries.flatMap((entry, index) => {
+    const record = asRecord(entry);
     if (!record) {
       return [];
     }
@@ -130,6 +133,27 @@ export function getCourseSections(data: LearnContentResponse): CourseSection[] {
       },
     ];
   });
+}
+
+export function getCourseSections(data: LearnContentResponse): CourseSection[] {
+  return getCourseEntries(data, "sections");
+}
+
+export function getCourseReferenceMaterial(
+  data: LearnContentResponse
+): CourseSection[] {
+  return getCourseEntries(data, "referenceMaterial");
+}
+
+export function referenceTabLabel(section: CourseSection, index: number) {
+  for (const key of ["title", "name", "heading", "entryName"]) {
+    const value = section.fields[key];
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return `Reference ${index + 1}`;
 }
 
 export function progressLabel(status: string) {

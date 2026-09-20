@@ -117,7 +117,7 @@ function ContentfulImage({
       alt={alt}
       width={width}
       height={height}
-      className="my-6 h-auto w-full rounded-2xl"
+      className="my-6 h-auto max-w-full rounded-2xl"
     />
   );
 }

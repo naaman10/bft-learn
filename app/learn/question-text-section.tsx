@@ -53,9 +53,11 @@ function FieldText({
 export function QuestionTextSection({
   section,
   savedAnswer,
+  showAnswer = true,
 }: {
   section: CourseSection;
   savedAnswer?: unknown;
+  showAnswer?: boolean;
 }) {
   const question = firstField(section.fields, [
     "questionText",
@@ -89,17 +91,21 @@ export function QuestionTextSection({
           className="rounded-2xl bg-accent-soft/70 px-4 py-3 text-sm text-foreground/80"
         />
       )}
-      <label className="sr-only" htmlFor={`answer-${section.entryId ?? "question"}`}>
-        Your answer
-      </label>
-      <textarea
-        id={`answer-${section.entryId ?? "question"}`}
-        name="answer"
-        defaultValue={defaultAnswer}
-        rows={8}
-        placeholder="Write your answer here…"
-        className="mt-1 min-h-40 w-full resize-y rounded-[22px] border border-border bg-background px-4 py-3.5 text-left text-lg leading-relaxed text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
-      />
+      {showAnswer ? (
+        <>
+          <label className="sr-only" htmlFor={`answer-${section.entryId ?? "question"}`}>
+            Your answer
+          </label>
+          <textarea
+            id={`answer-${section.entryId ?? "question"}`}
+            name="answer"
+            defaultValue={defaultAnswer}
+            rows={8}
+            placeholder="Write your answer here…"
+            className="mt-1 min-h-40 w-full resize-y rounded-[22px] border border-border bg-background px-4 py-3.5 text-left text-lg leading-relaxed text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
+          />
+        </>
+      ) : null}
     </div>
   );
 }
