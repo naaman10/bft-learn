@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { hasCredentialAccount } from "@/lib/auth/accounts";
 import {
   getCourseSections,
@@ -58,7 +58,7 @@ export default async function LearnSectionPage({
 }: {
   params: Promise<{ contentId: string; sectionIndex: string }>;
 }) {
-  const { data: session } = await auth.getSession();
+  const { data: session } = await getSession();
 
   if (!session?.user) {
     redirect("/auth/sign-in");

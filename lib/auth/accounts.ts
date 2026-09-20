@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth/server";
+import { listAccounts } from "@/lib/auth/session";
 
 type AccountLike = {
   providerId?: string;
@@ -13,6 +13,6 @@ function asAccountList(data: unknown): AccountLike[] {
 }
 
 export async function hasCredentialAccount(): Promise<boolean> {
-  const { data } = await auth.listAccounts();
+  const { data } = await listAccounts();
   return asAccountList(data).some((account) => account.providerId === "credential");
 }

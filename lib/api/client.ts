@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth/server";
+import { getAuthToken } from "@/lib/auth/session";
 
 type TokenPayload = {
   token?: string;
@@ -15,7 +15,7 @@ function apiUrl(path: string) {
 }
 
 async function getJwtToken() {
-  const { data } = await auth.token();
+  const { data } = await getAuthToken();
   const payload = data as TokenPayload | null;
 
   return typeof payload?.token === "string" ? payload.token : null;

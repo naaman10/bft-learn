@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { hasCredentialAccount } from "@/lib/auth/accounts";
 import { AuthShell } from "@/app/auth/auth-shell";
 import { SetPasswordForm } from "./set-password-form";
@@ -7,7 +7,7 @@ import { SetPasswordForm } from "./set-password-form";
 export const dynamic = "force-dynamic";
 
 export default async function SetPasswordPage() {
-  const { data: session } = await auth.getSession();
+  const { data: session } = await getSession();
 
   if (!session?.user) {
     redirect("/auth/sign-in");

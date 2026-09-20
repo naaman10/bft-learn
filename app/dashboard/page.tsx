@@ -4,7 +4,7 @@ import { InitialsAvatar, SignOutButton, firstName } from "@/app/app-header";
 import { ArrowUpRightIcon, ChevronRightIcon } from "@/app/ui/icons";
 import { CourseDoodle, EmptySparkle, HeroSparkle } from "@/app/ui/illustrations";
 import { ProgressRing } from "@/app/ui/progress-ring";
-import { auth } from "@/lib/auth/server";
+import { getSession } from "@/lib/auth/session";
 import { hasCredentialAccount } from "@/lib/auth/accounts";
 import {
   getLearnUser,
@@ -116,7 +116,7 @@ function EnrollmentCard({
 }
 
 export default async function DashboardPage() {
-  const { data: session } = await auth.getSession();
+  const { data: session } = await getSession();
 
   if (!session?.user) {
     redirect("/auth/sign-in");
