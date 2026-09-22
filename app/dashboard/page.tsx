@@ -13,6 +13,7 @@ import {
   type Enrollment,
 } from "@/lib/api/learn";
 import { redirect } from "next/navigation";
+import { AssessmentItem } from "@/app/dashboard/assessment-item";
 
 export const dynamic = "force-dynamic";
 
@@ -128,6 +129,7 @@ export default async function DashboardPage() {
 
   const learnUser = await getLearnUser();
   const enrollments = learnUser?.enrollments ?? [];
+  const assessments = learnUser?.assessments ?? [];
   const totalPoints =
     typeof learnUser?.totalPoints === "number" ? learnUser.totalPoints : 0;
   const targetPoints =
@@ -244,6 +246,24 @@ export default async function DashboardPage() {
                 />
               </div>
             </section>
+
+            {assessments.length > 0 && (
+              <section className="flex flex-col gap-3">
+                <div className="flex items-end justify-between">
+                  <h2 className="text-lg font-semibold tracking-tight">
+                    Assessments
+                  </h2>
+                  <p className="text-sm text-muted">
+                    {assessments.length} {assessments.length === 1 ? "assessment" : "assessments"}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {assessments.map((assessment) => (
+                    <AssessmentItem key={assessment.id} assessment={assessment} />
+                  ))}
+                </div>
+              </section>
+            )}
 
             <section className="flex flex-col gap-3">
               <div className="flex items-end justify-between">
