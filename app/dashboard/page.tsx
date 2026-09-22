@@ -130,6 +130,14 @@ export default async function DashboardPage() {
   const learnUser = await getLearnUser();
   const enrollments = learnUser?.enrollments ?? [];
   const assessments = learnUser?.assessments ?? [];
+  
+  console.log("[dashboard] Learn user data:", {
+    hasLearnUser: !!learnUser,
+    enrollmentsCount: enrollments.length,
+    assessmentsCount: assessments.length,
+    assessments: assessments,
+  });
+  
   const totalPoints =
     typeof learnUser?.totalPoints === "number" ? learnUser.totalPoints : 0;
   const targetPoints =
@@ -247,23 +255,31 @@ export default async function DashboardPage() {
               </div>
             </section>
 
-            {assessments.length > 0 && (
-              <section className="flex flex-col gap-3">
-                <div className="flex items-end justify-between">
-                  <h2 className="text-lg font-semibold tracking-tight">
-                    Assessments
-                  </h2>
+            <section className="flex flex-col gap-3">
+              <div className="flex items-end justify-between">
+                <h2 className="text-lg font-semibold tracking-tight">
+                  Assessments
+                </h2>
+                <p className="text-sm text-muted">
+                  {assessments.length === 0 
+                    ? "None yet" 
+                    : `${assessments.length} ${assessments.length === 1 ? "assessment" : "assessments"}`}
+                </p>
+              </div>
+              {assessments.length === 0 ? (
+                <div className="rounded-2xl bg-card p-6 text-center shadow-[var(--shadow-card)]">
                   <p className="text-sm text-muted">
-                    {assessments.length} {assessments.length === 1 ? "assessment" : "assessments"}
+                    Completed assessments will appear here
                   </p>
                 </div>
+              ) : (
                 <div className="flex flex-col gap-2">
                   {assessments.map((assessment) => (
                     <AssessmentItem key={assessment.id} assessment={assessment} />
                   ))}
                 </div>
-              </section>
-            )}
+              )}
+            </section>
 
             <section className="flex flex-col gap-3">
               <div className="flex items-end justify-between">
