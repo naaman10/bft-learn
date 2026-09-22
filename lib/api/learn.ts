@@ -16,6 +16,14 @@ export type Enrollment = {
   enrolledAt: string;
 };
 
+export type Assessment = {
+  id: string;
+  name: string;
+  pointsEarned: number;
+  pointsAvailable: number;
+  completedAt?: string;
+};
+
 export type LearnUserResponse = {
   authenticated: boolean;
   user: {
@@ -27,6 +35,7 @@ export type LearnUserResponse = {
     role: string;
   } | null;
   enrollments?: Enrollment[];
+  assessments?: Assessment[];
   totalPoints?: number;
   targetPoints?: number;
   error?: string;
