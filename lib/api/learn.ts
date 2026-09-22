@@ -95,17 +95,22 @@ function sectionContentType(section: Record<string, unknown>) {
   return "unknown";
 }
 
-function sectionEntryId(section: Record<string, unknown>, index: number) {
+function sectionEntryId(section: Record<string, unknown>, index: number): string | undefined {
+  // First check for direct entryId property
   if (typeof section.entryId === "string" && section.entryId) {
     return section.entryId;
   }
 
+  // Check Contentful sys.id (standard format for CMS entries)
   const sys = asRecord(section.sys);
   if (typeof sys?.id === "string" && sys.id) {
     return sys.id;
   }
 
-  return String(index);
+  // Log warning and return undefined instead of falling back to numeric index
+  // Numeric indices are not valid question IDs for the backend
+  console.warn("[learn] Section missing valid entryId", { index, section });
+  return undefined;
 }
 
 function getCourseEntries(
@@ -125,10 +130,12 @@ function getCourseEntries(
       return [];
     }
 
+    const entryId = sectionEntryId(record, index);
+    
     return [
       {
         contentType: sectionContentType(record),
-        entryId: sectionEntryId(record, index),
+        entryId,
         fields: asRecord(record.fields) ?? record,
       },
     ];

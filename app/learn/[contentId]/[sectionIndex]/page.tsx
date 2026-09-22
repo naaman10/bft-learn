@@ -129,10 +129,20 @@ export default async function LearnSectionPage({
           </Link>
         </div>
       ) : canComplete ? (
-        <CompleteContentForm contentId={contentId} itemId={section?.entryId}>
-          {sectionCard}
-          {sectionNav}
-        </CompleteContentForm>
+        section?.entryId ? (
+          <CompleteContentForm contentId={contentId} itemId={section.entryId}>
+            {sectionCard}
+            {sectionNav}
+          </CompleteContentForm>
+        ) : (
+          <>
+            {sectionCard}
+            {sectionNav}
+            <div className="rounded-2xl bg-error-bg px-4 py-3 text-sm text-error">
+              This section cannot be completed due to a configuration error. Please contact support.
+            </div>
+          </>
+        )
       ) : (
         <>
           {sectionCard}
