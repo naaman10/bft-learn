@@ -255,31 +255,23 @@ export default async function DashboardPage() {
               </div>
             </section>
 
-            <section className="flex flex-col gap-3">
-              <div className="flex items-end justify-between">
-                <h2 className="text-lg font-semibold tracking-tight">
-                  Assessments
-                </h2>
-                <p className="text-sm text-muted">
-                  {assessments.length === 0 
-                    ? "None yet" 
-                    : `${assessments.length} ${assessments.length === 1 ? "assessment" : "assessments"}`}
-                </p>
-              </div>
-              {assessments.length === 0 ? (
-                <div className="rounded-2xl bg-card p-6 text-center shadow-[var(--shadow-card)]">
+            {assessments.length > 0 && (
+              <section className="flex flex-col gap-3">
+                <div className="flex items-end justify-between">
+                  <h2 className="text-lg font-semibold tracking-tight">
+                    Assessments
+                  </h2>
                   <p className="text-sm text-muted">
-                    Completed assessments will appear here
+                    {assessments.length} {assessments.length === 1 ? "assessment" : "assessments"}
                   </p>
                 </div>
-              ) : (
                 <div className="flex flex-col gap-2">
                   {assessments.map((assessment) => (
                     <AssessmentItem key={assessment.id} assessment={assessment} />
                   ))}
                 </div>
-              )}
-            </section>
+              </section>
+            )}
 
             <section className="flex flex-col gap-3">
               <div className="flex items-end justify-between">
