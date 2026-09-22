@@ -208,6 +208,18 @@ type ProgressPatch = {
   >;
 };
 
+type SaveProgressPatch = {
+  action?: "save";
+  currentItemId?: string;
+  items?: Record<
+    string,
+    {
+      answer?: unknown;
+      status?: Extract<ProgressStatus, "not_started" | "in_progress" | "completed">;
+    }
+  >;
+};
+
 export async function completeLearnContent(
   contentId: string,
   patch: ProgressPatch
@@ -215,6 +227,18 @@ export async function completeLearnContent(
   return apiFetch<{
     progressStatus: ProgressStatus;
     completedAt: string | null;
+  }>(`/learn/content/${encodeURIComponent(contentId)}/progress`, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
+}
+
+export async function saveLearnProgress(
+  contentId: string,
+  patch: SaveProgressPatch
+) {
+  return apiFetch<{
+    progressStatus: ProgressStatus;
   }>(`/learn/content/${encodeURIComponent(contentId)}/progress`, {
     method: "PATCH",
     body: JSON.stringify(patch),

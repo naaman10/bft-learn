@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { ApiError } from "@/lib/api/client";
-import { completeLearnContent } from "@/lib/api/learn";
+import { completeLearnContent, saveLearnProgress } from "@/lib/api/learn";
 
 export async function completeContent(
   _prevState: { error: string } | null,
@@ -46,4 +46,35 @@ export async function completeContent(
   }
 
   redirect("/dashboard");
+}
+
+export async function saveProgress(
+  contentId: string,
+  itemId: string,
+  answer: string
+): Promise<{ success: boolean; error?: string }> {
+  if (!contentId || !itemId) {
+    return { success: false, error: "Invalid request" };
+  }
+
+  try {
+    await saveLearnProgress(contentId, {
+      action: "save",
+      currentItemId: itemId,
+      items: {
+        [itemId]: {
+          answer,
+          status: "in_progress",
+        },
+      },
+    });
+    return { success: true };
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      redirect("/auth/sign-in");
+    }
+
+    console.error("[learn] Failed to save progress", { contentId, itemId, error });
+    return { success: false, error: "Failed to save" };
+  }
 }

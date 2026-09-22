@@ -72,6 +72,7 @@ export default async function LearnSectionPage({
             ? result.data.progress.items[section.entryId]?.answer
             : undefined
         }
+        contentId={contentId}
       />
     </div>
   );

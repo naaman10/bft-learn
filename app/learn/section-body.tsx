@@ -6,10 +6,12 @@ export function SectionBody({
   section,
   savedAnswer,
   variant = "task",
+  contentId,
 }: {
   section: CourseSection | null;
   savedAnswer?: unknown;
   variant?: "task" | "reference";
+  contentId?: string;
 }) {
   if (!section) {
     return <p className="text-muted">This section could not be found.</p>;
@@ -25,6 +27,7 @@ export function SectionBody({
         section={section}
         savedAnswer={savedAnswer}
         showAnswer={variant === "task"}
+        contentId={contentId}
       />
     );
   }

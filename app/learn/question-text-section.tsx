@@ -2,6 +2,7 @@ import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import { BLOCKS } from "@contentful/rich-text-types";
 import type { Document } from "@contentful/rich-text-types";
 import type { CourseSection } from "@/lib/api/learn";
+import { AnswerTextarea } from "@/app/learn/answer-textarea";
 
 function isDocument(value: unknown): value is Document {
   return Boolean(
@@ -54,10 +55,12 @@ export function QuestionTextSection({
   section,
   savedAnswer,
   showAnswer = true,
+  contentId,
 }: {
   section: CourseSection;
   savedAnswer?: unknown;
   showAnswer?: boolean;
+  contentId?: string;
 }) {
   const question = firstField(section.fields, [
     "questionText",
@@ -92,19 +95,27 @@ export function QuestionTextSection({
         />
       )}
       {showAnswer ? (
-        <>
-          <label className="sr-only" htmlFor={`answer-${section.entryId ?? "question"}`}>
-            Your answer
-          </label>
-          <textarea
-            id={`answer-${section.entryId ?? "question"}`}
-            name="answer"
+        section.entryId && contentId ? (
+          <AnswerTextarea
+            contentId={contentId}
+            itemId={section.entryId}
             defaultValue={defaultAnswer}
-            rows={8}
-            placeholder="Write your answer here…"
-            className="mt-1 min-h-40 w-full resize-y rounded-[22px] border border-border bg-background px-4 py-3.5 text-left text-lg leading-relaxed text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
           />
-        </>
+        ) : (
+          <>
+            <label className="sr-only" htmlFor={`answer-${section.entryId ?? "question"}`}>
+              Your answer
+            </label>
+            <textarea
+              id={`answer-${section.entryId ?? "question"}`}
+              name="answer"
+              defaultValue={defaultAnswer}
+              rows={8}
+              placeholder="Write your answer here…"
+              className="mt-1 min-h-40 w-full resize-y rounded-[22px] border border-border bg-background px-4 py-3.5 text-left text-lg leading-relaxed text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
+            />
+          </>
+        )
       ) : null}
     </div>
   );
