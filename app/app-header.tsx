@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { signOut } from "@/app/dashboard/actions";
-import { SignOutIcon, InboxIcon } from "@/app/ui/icons";
+import { SignOutIcon, InboxIcon, GamepadIcon } from "@/app/ui/icons";
 import { getUnreadNotificationCount } from "@/lib/api/learn";
 
 export function SignOutButton({
@@ -55,6 +55,18 @@ export function InboxButton({
   );
 }
 
+export function GamesButton() {
+  return (
+    <Link
+      href="/games"
+      aria-label="Games"
+      className="grid h-11 w-11 place-items-center rounded-full bg-card text-muted shadow-[var(--shadow-card)] hover:text-foreground"
+    >
+      <GamepadIcon className="h-5 w-5" />
+    </Link>
+  );
+}
+
 export async function DesktopBrandBar() {
   const unreadCount = await getUnreadNotificationCount();
   
@@ -63,6 +75,7 @@ export async function DesktopBrandBar() {
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-8 py-5">
         <img src="/bft-learn-logo.png" alt="BFT Learn" className="h-8" />
         <div className="flex items-center gap-3">
+          <GamesButton />
           <InboxButton notificationCount={unreadCount} />
           <SignOutButton variant="icon" />
         </div>
