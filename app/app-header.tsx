@@ -1,5 +1,5 @@
 import { signOut } from "@/app/dashboard/actions";
-import { SignOutIcon } from "@/app/ui/icons";
+import { SignOutIcon, InboxIcon } from "@/app/ui/icons";
 
 export function SignOutButton({
   variant = "text",
@@ -32,12 +32,36 @@ export function SignOutButton({
   );
 }
 
+export function InboxButton({
+  notificationCount = 0,
+}: {
+  notificationCount?: number;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={`Inbox${notificationCount > 0 ? ` (${notificationCount} new notifications)` : ""}`}
+      className="relative grid h-11 w-11 place-items-center rounded-full bg-card text-muted shadow-[var(--shadow-card)] hover:text-foreground"
+    >
+      <InboxIcon className="h-5 w-5" />
+      {notificationCount > 0 && (
+        <span className="absolute right-0 top-0 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-accent px-1 text-xs font-semibold text-white">
+          {notificationCount > 99 ? "99+" : notificationCount}
+        </span>
+      )}
+    </button>
+  );
+}
+
 export function DesktopBrandBar() {
   return (
     <header className="hidden md:block">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-8 py-5">
         <img src="/bft-learn-logo.png" alt="BFT Learn" className="h-8" />
-        <SignOutButton />
+        <div className="flex items-center gap-3">
+          <InboxButton notificationCount={3} />
+          <SignOutButton />
+        </div>
       </div>
     </header>
   );
