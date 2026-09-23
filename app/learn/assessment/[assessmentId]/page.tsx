@@ -65,6 +65,13 @@ export default async function AssessmentDetailPage({
       : 0;
   const completedDate = formatDate(assessment.assessmentDate);
 
+  // Debug: Log assessment data to see actual structure
+  console.log('[AssessmentDetail] Assessment data:', {
+    assessmentId,
+    questionCount: assessment.questions.length,
+    firstQuestion: assessment.questions[0],
+  });
+
   return (
     <AppShell>
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-5 py-4 md:px-8 md:py-6">
@@ -155,6 +162,13 @@ export default async function AssessmentDetailPage({
                       <p className="mb-3 leading-relaxed">
                         {question.questionText}
                       </p>
+
+                      {/* Debug: Show if userAnswer exists */}
+                      {process.env.NODE_ENV === 'development' && (
+                        <div className="mb-2 text-xs text-red-500">
+                          Debug: userAnswer = {question.userAnswer ? `"${question.userAnswer}"` : 'null/undefined'}
+                        </div>
+                      )}
 
                       {question.userAnswer && (
                         <div className="mb-3 rounded-lg bg-muted/30 p-3">
