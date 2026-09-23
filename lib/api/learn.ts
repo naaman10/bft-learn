@@ -35,7 +35,7 @@ export type LearnUserResponse = {
     role: string;
   } | null;
   enrollments?: Enrollment[];
-  assessments?: Assessment[];
+  completedAssessments?: Assessment[];
   totalPoints?: number;
   targetPoints?: number;
   error?: string;

@@ -129,16 +129,7 @@ export default async function DashboardPage() {
 
   const learnUser = await getLearnUser();
   const enrollments = learnUser?.enrollments ?? [];
-  const assessments = learnUser?.assessments ?? [];
-  
-  console.log("[dashboard] Learn user data:", {
-    hasLearnUser: !!learnUser,
-    enrollmentsCount: enrollments.length,
-    assessmentsCount: assessments.length,
-    assessments: assessments,
-    rawLearnUser: learnUser,
-  });
-  
+  const assessments = learnUser?.completedAssessments ?? [];
   const totalPoints =
     typeof learnUser?.totalPoints === "number" ? learnUser.totalPoints : 0;
   const targetPoints =
@@ -255,16 +246,6 @@ export default async function DashboardPage() {
                 />
               </div>
             </section>
-
-            {/* Debug: Show raw assessments data */}
-            {process.env.NODE_ENV === 'development' && (
-              <details className="rounded-lg bg-yellow-50 p-4 text-xs">
-                <summary className="cursor-pointer font-semibold">Debug: Assessments Data</summary>
-                <pre className="mt-2 overflow-auto">
-                  {JSON.stringify({ assessments, assessmentsLength: assessments.length }, null, 2)}
-                </pre>
-              </details>
-            )}
 
             {assessments.length > 0 && (
               <section className="flex flex-col gap-3">
