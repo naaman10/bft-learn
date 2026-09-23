@@ -10,29 +10,22 @@ function formatDate(value?: string) {
 }
 
 export function AssessmentItem({ assessment }: { assessment: Assessment }) {
-  // Handle missing or invalid values
-  const pointsEarned = typeof assessment.pointsEarned === 'number' ? assessment.pointsEarned : 0;
+  const pointsScored = typeof assessment.pointsScored === 'number' ? assessment.pointsScored : 0;
   const pointsAvailable = typeof assessment.pointsAvailable === 'number' ? assessment.pointsAvailable : 0;
-  const name = assessment.name || 'Assessment';
+  const name = assessment.enrollmentName || 'Assessment';
   
   const passPercentage =
     pointsAvailable > 0
-      ? Math.round((pointsEarned / pointsAvailable) * 100)
+      ? Math.round((pointsScored / pointsAvailable) * 100)
       : 0;
   const pct =
     pointsAvailable > 0
-      ? Math.min(1, pointsEarned / pointsAvailable)
+      ? Math.min(1, pointsScored / pointsAvailable)
       : 0;
   const radius = 28;
   const circumference = 2 * Math.PI * radius;
   const dash = circumference * pct;
   const completedDate = formatDate(assessment.completedAt);
-  
-  // Debug log to see actual data structure
-  console.log('[AssessmentItem] Rendering assessment:', {
-    raw: assessment,
-    computed: { pointsEarned, pointsAvailable, name, passPercentage }
-  });
 
   return (
     <div className="flex items-center gap-4 rounded-2xl bg-card p-4 shadow-[var(--shadow-card)]">
@@ -63,7 +56,7 @@ export function AssessmentItem({ assessment }: { assessment: Assessment }) {
         </svg>
         <span className="absolute flex flex-col items-center leading-none">
           <span className="text-base font-semibold tabular-nums">
-            {pointsEarned}
+            {pointsScored}
           </span>
           <span className="mt-0.5 text-[10px] font-medium text-muted">
             of {pointsAvailable}

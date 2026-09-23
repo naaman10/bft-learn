@@ -17,9 +17,9 @@ export type Enrollment = {
 };
 
 export type Assessment = {
-  id: string;
-  name: string;
-  pointsEarned: number;
+  assessmentId: string;
+  enrollmentName: string;
+  pointsScored: number;
   pointsAvailable: number;
   completedAt?: string;
 };

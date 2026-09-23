@@ -259,7 +259,7 @@ export default async function DashboardPage() {
                 </div>
                 <div className="flex flex-col gap-2">
                   {assessments.map((assessment) => (
-                    <AssessmentItem key={assessment.id} assessment={assessment} />
+                    <AssessmentItem key={assessment.assessmentId} assessment={assessment} />
                   ))}
                 </div>
               </section>
