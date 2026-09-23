@@ -60,7 +60,7 @@ export function DesktopBrandBar() {
         <img src="/bft-learn-logo.png" alt="BFT Learn" className="h-8" />
         <div className="flex items-center gap-3">
           <InboxButton notificationCount={3} />
-          <SignOutButton />
+          <SignOutButton variant="icon" />
         </div>
       </div>
     </header>
