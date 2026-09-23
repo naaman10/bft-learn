@@ -10,18 +10,29 @@ function formatDate(value?: string) {
 }
 
 export function AssessmentItem({ assessment }: { assessment: Assessment }) {
+  // Handle missing or invalid values
+  const pointsEarned = typeof assessment.pointsEarned === 'number' ? assessment.pointsEarned : 0;
+  const pointsAvailable = typeof assessment.pointsAvailable === 'number' ? assessment.pointsAvailable : 0;
+  const name = assessment.name || 'Assessment';
+  
   const passPercentage =
-    assessment.pointsAvailable > 0
-      ? Math.round((assessment.pointsEarned / assessment.pointsAvailable) * 100)
+    pointsAvailable > 0
+      ? Math.round((pointsEarned / pointsAvailable) * 100)
       : 0;
   const pct =
-    assessment.pointsAvailable > 0
-      ? Math.min(1, assessment.pointsEarned / assessment.pointsAvailable)
+    pointsAvailable > 0
+      ? Math.min(1, pointsEarned / pointsAvailable)
       : 0;
   const radius = 28;
   const circumference = 2 * Math.PI * radius;
   const dash = circumference * pct;
   const completedDate = formatDate(assessment.completedAt);
+  
+  // Debug log to see actual data structure
+  console.log('[AssessmentItem] Rendering assessment:', {
+    raw: assessment,
+    computed: { pointsEarned, pointsAvailable, name, passPercentage }
+  });
 
   return (
     <div className="flex items-center gap-4 rounded-2xl bg-card p-4 shadow-[var(--shadow-card)]">
@@ -52,20 +63,20 @@ export function AssessmentItem({ assessment }: { assessment: Assessment }) {
         </svg>
         <span className="absolute flex flex-col items-center leading-none">
           <span className="text-base font-semibold tabular-nums">
-            {assessment.pointsEarned}
+            {pointsEarned}
           </span>
           <span className="mt-0.5 text-[10px] font-medium text-muted">
-            of {assessment.pointsAvailable}
+            of {pointsAvailable}
           </span>
         </span>
       </div>
 
       <div className="flex-1 min-w-0">
         <h3 className="font-semibold leading-snug truncate">
-          {assessment.name}
+          {name}
         </h3>
         <div className="mt-1 flex items-center gap-2 text-sm text-muted">
-          <span className="font-medium">Pass mark: {passPercentage}%</span>
+          <span className="font-medium">{passPercentage}%</span>
           {completedDate && (
             <>
               <span aria-hidden="true">•</span>
