@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { signOut } from "@/app/dashboard/actions";
 import { SignOutIcon, InboxIcon } from "@/app/ui/icons";
+import { getUnreadNotificationCount } from "@/lib/api/learn";
 
 export function SignOutButton({
   variant = "text",
@@ -38,8 +40,8 @@ export function InboxButton({
   notificationCount?: number;
 }) {
   return (
-    <button
-      type="button"
+    <Link
+      href="/notifications"
       aria-label={`Inbox${notificationCount > 0 ? ` (${notificationCount} new notifications)` : ""}`}
       className="relative grid h-11 w-11 place-items-center rounded-full bg-card text-muted shadow-[var(--shadow-card)] hover:text-foreground"
     >
@@ -49,17 +51,19 @@ export function InboxButton({
           {notificationCount > 99 ? "99+" : notificationCount}
         </span>
       )}
-    </button>
+    </Link>
   );
 }
 
-export function DesktopBrandBar() {
+export async function DesktopBrandBar() {
+  const unreadCount = await getUnreadNotificationCount();
+  
   return (
     <header className="hidden md:block">
       <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-8 py-5">
         <img src="/bft-learn-logo.png" alt="BFT Learn" className="h-8" />
         <div className="flex items-center gap-3">
-          <InboxButton notificationCount={3} />
+          <InboxButton notificationCount={unreadCount} />
           <SignOutButton variant="icon" />
         </div>
       </div>
