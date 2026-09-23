@@ -57,6 +57,7 @@ export type LearnUserResponse = {
   completedAssessments?: Assessment[];
   totalPoints?: number;
   targetPoints?: number;
+  unreadNotificationCount?: number;
   error?: string;
 };
 
@@ -318,3 +319,102 @@ export const getLearnContent = cache(
     }
   }
 );
+
+export type Notification = {
+  id: string;
+  type: string;
+  read: boolean;
+  title: string;
+  message: string;
+  metadata?: {
+    contentName?: string;
+    contentType?: string;
+  };
+  enrollmentId?: string;
+  contentId?: string;
+  createdAt: string;
+};
+
+export type NotificationsResponse = {
+  notifications: Notification[];
+  total: number;
+  unread: number;
+};
+
+export type UnreadCountResponse = {
+  count: number;
+};
+
+export async function getNotifications(params?: {
+  limit?: number;
+  offset?: number;
+  unread?: boolean;
+}): Promise<NotificationsResponse | null> {
+  try {
+    const searchParams = new URLSearchParams();
+    if (params?.limit !== undefined) {
+      searchParams.set("limit", String(params.limit));
+    }
+    if (params?.offset !== undefined) {
+      searchParams.set("offset", String(params.offset));
+    }
+    if (params?.unread !== undefined) {
+      searchParams.set("unread", String(params.unread));
+    }
+    
+    const query = searchParams.toString();
+    const path = query ? `/learn/notifications?${query}` : "/learn/notifications";
+    
+    return await apiFetch<NotificationsResponse>(path);
+  } catch (error) {
+    console.error("[learn] Failed to load notifications", error);
+    return null;
+  }
+}
+
+export async function getUnreadNotificationCount(): Promise<number> {
+  try {
+    const response = await apiFetch<UnreadCountResponse>(
+      "/learn/notifications/unread-count"
+    );
+    return response.count;
+  } catch (error) {
+    console.error("[learn] Failed to load unread count", error);
+    return 0;
+  }
+}
+
+export async function markNotificationAsRead(
+  notificationId: string
+): Promise<boolean> {
+  try {
+    await apiFetch<{ success: boolean }>(
+      `/learn/notifications/${encodeURIComponent(notificationId)}/read`,
+      {
+        method: "PATCH",
+      }
+    );
+    return true;
+  } catch (error) {
+    console.error("[learn] Failed to mark notification as read", error);
+    return false;
+  }
+}
+
+export async function markAllNotificationsAsRead(): Promise<{
+  success: boolean;
+  count: number;
+}> {
+  try {
+    const response = await apiFetch<{ success: boolean; count: number }>(
+      "/learn/notifications/read-all",
+      {
+        method: "PATCH",
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("[learn] Failed to mark all notifications as read", error);
+    return { success: false, count: 0 };
+  }
+}
