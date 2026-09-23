@@ -156,6 +156,17 @@ export default async function AssessmentDetailPage({
                         {question.questionText}
                       </p>
 
+                      {question.userAnswer && (
+                        <div className="mb-3 rounded-lg bg-muted/30 p-3">
+                          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
+                            Your Answer
+                          </p>
+                          <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                            {question.userAnswer}
+                          </p>
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold">

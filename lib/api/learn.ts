@@ -30,6 +30,7 @@ export type AssessmentQuestion = {
   pointsAvailable: number;
   pointsEarned: number;
   feedback: string | null;
+  userAnswer: string | null;
 };
 
 export type AssessmentDetail = {
