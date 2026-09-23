@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Assessment } from "@/lib/api/learn";
 
 function formatDate(value?: string) {
@@ -28,56 +29,61 @@ export function AssessmentItem({ assessment }: { assessment: Assessment }) {
   const completedDate = formatDate(assessment.completedAt);
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl bg-card p-4 shadow-[var(--shadow-card)]">
-      <div className="relative grid shrink-0 place-items-center">
-        <svg
-          viewBox="0 0 100 100"
-          className="h-16 w-16 -rotate-90"
-          aria-hidden="true"
-        >
-          <circle
-            cx="50"
-            cy="50"
-            r={radius}
-            fill="none"
-            stroke="var(--accent-soft)"
-            strokeWidth="12"
-          />
-          <circle
-            cx="50"
-            cy="50"
-            r={radius}
-            fill="none"
-            stroke="var(--accent)"
-            strokeWidth="12"
-            strokeLinecap="round"
-            strokeDasharray={`${dash} ${circumference}`}
-          />
-        </svg>
-        <span className="absolute flex flex-col items-center leading-none">
-          <span className="text-base font-semibold tabular-nums">
-            {pointsScored}
+    <Link
+      href={`/learn/assessment/${assessment.assessmentId}`}
+      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+    >
+      <div className="flex items-center gap-4 rounded-2xl bg-card p-4 shadow-[var(--shadow-card)] transition-shadow hover:shadow-lg">
+        <div className="relative grid shrink-0 place-items-center">
+          <svg
+            viewBox="0 0 100 100"
+            className="h-16 w-16 -rotate-90"
+            aria-hidden="true"
+          >
+            <circle
+              cx="50"
+              cy="50"
+              r={radius}
+              fill="none"
+              stroke="var(--accent-soft)"
+              strokeWidth="12"
+            />
+            <circle
+              cx="50"
+              cy="50"
+              r={radius}
+              fill="none"
+              stroke="var(--accent)"
+              strokeWidth="12"
+              strokeLinecap="round"
+              strokeDasharray={`${dash} ${circumference}`}
+            />
+          </svg>
+          <span className="absolute flex flex-col items-center leading-none">
+            <span className="text-base font-semibold tabular-nums">
+              {pointsScored}
+            </span>
+            <span className="mt-0.5 text-[10px] font-medium text-muted">
+              of {pointsAvailable}
+            </span>
           </span>
-          <span className="mt-0.5 text-[10px] font-medium text-muted">
-            of {pointsAvailable}
-          </span>
-        </span>
-      </div>
+        </div>
 
-      <div className="flex-1 min-w-0">
-        <h3 className="font-semibold leading-snug truncate">
-          {name}
-        </h3>
-        <div className="mt-1 flex items-center gap-2 text-sm text-muted">
-          <span className="font-medium">{passPercentage}%</span>
-          {completedDate && (
-            <>
-              <span aria-hidden="true">•</span>
-              <span>{completedDate}</span>
-            </>
-          )}
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold leading-snug truncate">
+            {name}
+          </h3>
+          <div className="mt-1 flex items-center gap-2 text-sm text-muted">
+            <span className="font-medium">{passPercentage}%</span>
+            {completedDate && (
+              <>
+                <span aria-hidden="true">•</span>
+                <span>{completedDate}</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

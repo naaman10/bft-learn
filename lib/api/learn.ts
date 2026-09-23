@@ -24,6 +24,24 @@ export type Assessment = {
   completedAt?: string;
 };
 
+export type AssessmentQuestion = {
+  questionId: string;
+  questionText: string;
+  pointsAvailable: number;
+  pointsEarned: number;
+  feedback: string | null;
+};
+
+export type AssessmentDetail = {
+  assessmentId: string;
+  enrollmentName: string;
+  totalPointsEarned: number;
+  totalPointsAvailable: number;
+  questions: AssessmentQuestion[];
+  assessmentFeedback: string | null;
+  assessmentDate: string | null;
+};
+
 export type LearnUserResponse = {
   authenticated: boolean;
   user: {
@@ -259,6 +277,19 @@ export async function getLearnUser(): Promise<LearnUserResponse | null> {
     return await apiFetch<LearnUserResponse>("/learn/user");
   } catch (error) {
     console.error("[learn] Failed to load user", error);
+    return null;
+  }
+}
+
+export async function getAssessmentDetail(
+  assessmentId: string
+): Promise<AssessmentDetail | null> {
+  try {
+    return await apiFetch<AssessmentDetail>(
+      `/learn/assessment/${encodeURIComponent(assessmentId)}`
+    );
+  } catch (error) {
+    console.error("[learn] Failed to load assessment", error);
     return null;
   }
 }
