@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Assessment } from "@/lib/api/learn";
+import { ArrowUpRightIcon } from "@/app/ui/icons";
 
 function formatDate(value?: string) {
   if (!value) return null;
@@ -69,19 +70,29 @@ export function AssessmentItem({ assessment }: { assessment: Assessment }) {
           </span>
         </div>
 
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold leading-snug truncate">
-            {name}
-          </h3>
-          <div className="mt-1 flex items-center gap-2 text-sm text-muted">
-            <span className="font-medium">{passPercentage}%</span>
-            {completedDate && (
-              <>
-                <span aria-hidden="true">•</span>
-                <span>{completedDate}</span>
-              </>
-            )}
+        <div className="flex flex-1 min-w-0 items-center justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold leading-snug truncate">
+              {name}
+            </h3>
+            <div className="mt-1 flex items-center gap-2 text-sm text-muted">
+              <span className="font-medium">{passPercentage}%</span>
+              {completedDate && (
+                <>
+                  <span aria-hidden="true">•</span>
+                  <span>{completedDate}</span>
+                </>
+              )}
+            </div>
           </div>
+
+          <button
+            className="flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-hover"
+            aria-label={`View ${name}`}
+          >
+            View
+            <ArrowUpRightIcon className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </Link>
