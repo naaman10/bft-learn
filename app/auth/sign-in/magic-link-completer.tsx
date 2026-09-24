@@ -23,11 +23,23 @@ export function MagicLinkCompleter({ verifier }: { verifier: string }) {
           return;
         }
 
-        if (!result?.error) {
-          return;
+        if (result?.error) {
+          // Server action returned an error, try client SDK fallback
+          throw new Error(result.error);
         }
-      } catch {
-        // Fall through to the client SDK exchange.
+
+        // Server action succeeded but didn't redirect (shouldn't happen),
+        // fall through to client SDK check
+      } catch (error) {
+        // Check if this is a Next.js redirect error that should propagate
+        if (error && typeof error === "object" && "digest" in error) {
+          const digest = (error as { digest?: string }).digest;
+          if (typeof digest === "string" && digest.startsWith("NEXT_REDIRECT")) {
+            // This is a redirect from the server action, let it propagate
+            throw error;
+          }
+        }
+        // Fall through to the client SDK exchange for other errors
       }
 
       try {
