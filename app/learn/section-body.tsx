@@ -16,6 +16,19 @@ function hasOptions(section: CourseSection): boolean {
   return Array.isArray(options) && options.length > 0;
 }
 
+function isQuestionType(contentType: string): boolean {
+  const questionTypes = [
+    "question",
+    "multipleChoiceQuestion",
+    "mcQuestion",
+    "textQuestion",
+    "openQuestion",
+  ];
+  return questionTypes.some(type => 
+    contentType.toLowerCase().includes(type.toLowerCase())
+  );
+}
+
 export function SectionBody({
   section,
   savedAnswer,
@@ -35,13 +48,14 @@ export function SectionBody({
     return <InfoSection section={section} />;
   }
 
-  if (section.contentType === "question") {
+  if (isQuestionType(section.contentType)) {
     if (hasOptions(section)) {
       return (
         <QuestionMultipleChoiceSection
           section={section}
           savedAnswer={savedAnswer}
           showAnswer={variant === "task"}
+          contentId={contentId}
         />
       );
     }

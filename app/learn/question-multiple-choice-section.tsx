@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS } from "@contentful/rich-text-types";
 import type { Document } from "@contentful/rich-text-types";
 import type { CourseSection } from "@/lib/api/learn";
+import { saveProgress } from "@/app/learn/[contentId]/actions";
 
 function isDocument(value: unknown): value is Document {
   return Boolean(
@@ -95,16 +96,19 @@ function OptionButton({
   option,
   isSelected,
   onSelect,
+  disabled = false,
 }: {
   option: MultipleChoiceOption;
   isSelected: boolean;
   onSelect: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onSelect}
-      className={`relative flex min-h-[120px] flex-col items-start justify-center rounded-2xl border-2 p-4 text-left transition-all hover:border-accent hover:shadow-md ${
+      disabled={disabled}
+      className={`relative flex min-h-[120px] flex-col items-start justify-center rounded-2xl border-2 p-4 text-left transition-all hover:border-accent hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed ${
         isSelected
           ? "border-accent bg-accent-soft/30 shadow-md"
           : "border-border bg-background"
@@ -151,10 +155,12 @@ export function QuestionMultipleChoiceSection({
   section,
   savedAnswer,
   showAnswer = true,
+  contentId,
 }: {
   section: CourseSection;
   savedAnswer?: unknown;
   showAnswer?: boolean;
+  contentId?: string;
 }) {
   const question = firstField(section.fields, [
     "questionText",
@@ -176,6 +182,30 @@ export function QuestionMultipleChoiceSection({
   const defaultSelectedId =
     typeof savedAnswer === "string" ? savedAnswer : "";
   const [selectedId, setSelectedId] = useState(defaultSelectedId);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+
+  const handleSelect = useCallback(
+    async (optionId: string) => {
+      setSelectedId(optionId);
+      
+      // Auto-save if contentId and itemId are available
+      if (contentId && section.entryId) {
+        setSaveStatus("saving");
+        const result = await saveProgress(contentId, section.entryId, optionId);
+        
+        if (result.success) {
+          setSaveStatus("saved");
+          setTimeout(() => setSaveStatus("idle"), 2000);
+        } else {
+          setSaveStatus("error");
+          setTimeout(() => setSaveStatus("idle"), 3000);
+        }
+      }
+    },
+    [contentId, section.entryId]
+  );
+
+  const hasAutoSave = Boolean(contentId && section.entryId);
 
   return (
     <div className="flex flex-1 flex-col gap-4">
@@ -195,17 +225,35 @@ export function QuestionMultipleChoiceSection({
       )}
       {showAnswer && options.length > 0 ? (
         <div className="mt-2">
-          <input type="hidden" name="answer" value={selectedId} />
+          {/* Hidden input for form submission (when not using auto-save) */}
+          {!hasAutoSave && <input type="hidden" name="answer" value={selectedId} />}
+          
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {options.map((option) => (
               <OptionButton
                 key={option.id}
                 option={option}
                 isSelected={selectedId === option.id}
-                onSelect={() => setSelectedId(option.id)}
+                onSelect={() => handleSelect(option.id)}
+                disabled={saveStatus === "saving"}
               />
             ))}
           </div>
+          
+          {/* Save status indicator for auto-save mode */}
+          {hasAutoSave && saveStatus !== "idle" && (
+            <div className="mt-2 flex items-center gap-2">
+              {saveStatus === "saving" && (
+                <p className="text-sm text-muted">Saving...</p>
+              )}
+              {saveStatus === "saved" && (
+                <p className="text-sm text-green-600">Saved ✓</p>
+              )}
+              {saveStatus === "error" && (
+                <p className="text-sm text-error">Failed to save. Try again.</p>
+              )}
+            </div>
+          )}
         </div>
       ) : showAnswer ? (
         <p className="text-muted">No options available for this question.</p>
