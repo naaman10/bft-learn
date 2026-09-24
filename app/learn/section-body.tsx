@@ -42,6 +42,7 @@ export function SectionBody({
           section={section}
           savedAnswer={savedAnswer}
           showAnswer={variant === "task"}
+          contentId={contentId}
         />
       );
     }
