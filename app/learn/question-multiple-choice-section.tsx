@@ -151,12 +151,10 @@ export function QuestionMultipleChoiceSection({
   section,
   savedAnswer,
   showAnswer = true,
-  contentId,
 }: {
   section: CourseSection;
   savedAnswer?: unknown;
   showAnswer?: boolean;
-  contentId?: string;
 }) {
   const question = firstField(section.fields, [
     "questionText",
