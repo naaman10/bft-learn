@@ -53,7 +53,6 @@ export default async function LearnContentLayout({
     ? [
         result.data.content.subject,
         result.data.content.stage,
-        result.data.content.ageGroup,
       ].filter((value) => value?.trim())
     : [];
   const sectionCount = result.ok
