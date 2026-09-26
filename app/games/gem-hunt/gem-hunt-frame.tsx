@@ -73,24 +73,32 @@ export function GemHuntFrame({
     console.log("[GemHuntFrame] Expected game origin:", gamesOrigin);
     
     const onMessage = (event: MessageEvent) => {
-      console.log("[GemHuntFrame] Received message:", event.data);
-      console.log("[GemHuntFrame] Message origin:", event.origin);
+      // Log ALL messages for debugging
+      console.log("[GemHuntFrame] Received ANY message:", {
+        type: event.data?.type,
+        origin: event.origin,
+        data: event.data
+      });
       
-      if (gamesOrigin !== "*" && event.origin !== gamesOrigin) {
-        console.warn("[GemHuntFrame] Origin mismatch - ignoring message");
-        return;
-      }
+      // Skip non-object messages
       if (!event.data || typeof event.data !== "object") {
-        console.warn("[GemHuntFrame] Invalid message data");
-        return;
-      }
-      if (event.data.type !== "GAME_READY") {
-        console.log("[GemHuntFrame] Not GAME_READY, ignoring");
         return;
       }
       
-      console.log("[GemHuntFrame] GAME_READY received! Calling sendInit");
-      sendInit();
+      // Only check origin for GAME_READY messages
+      if (event.data.type === "GAME_READY") {
+        console.log("[GemHuntFrame] GAME_READY message detected!");
+        console.log("[GemHuntFrame] Message origin:", event.origin);
+        console.log("[GemHuntFrame] Expected origin:", gamesOrigin);
+        
+        if (gamesOrigin !== "*" && event.origin !== gamesOrigin) {
+          console.error("[GemHuntFrame] Origin mismatch! Expected:", gamesOrigin, "Got:", event.origin);
+          return;
+        }
+        
+        console.log("[GemHuntFrame] GAME_READY received! Calling sendInit");
+        sendInit();
+      }
     };
 
     window.addEventListener("message", onMessage);
