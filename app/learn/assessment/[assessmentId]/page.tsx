@@ -20,6 +20,31 @@ function formatDate(value: string | null) {
   }).format(date);
 }
 
+function getDisplayAnswer(question: {
+  userAnswer: string | null;
+  questionType?: string;
+  options?: Array<{ id: string; text: string; imageUrl?: string }>;
+}): string | null {
+  if (!question.userAnswer) {
+    return null;
+  }
+
+  if (
+    question.questionType === "questionMultipleChoice" &&
+    question.options &&
+    question.options.length > 0
+  ) {
+    const selectedOption = question.options.find(
+      (opt) => opt.id === question.userAnswer
+    );
+    if (selectedOption) {
+      return selectedOption.text;
+    }
+  }
+
+  return question.userAnswer;
+}
+
 export default async function AssessmentDetailPage({
   params,
 }: {
@@ -64,13 +89,6 @@ export default async function AssessmentDetailPage({
         )
       : 0;
   const completedDate = formatDate(assessment.assessmentDate);
-
-  // Debug: Log assessment data to see actual structure
-  console.log('[AssessmentDetail] Assessment data:', {
-    assessmentId,
-    questionCount: assessment.questions.length,
-    firstQuestion: assessment.questions[0],
-  });
 
   return (
     <AppShell>
@@ -163,23 +181,19 @@ export default async function AssessmentDetailPage({
                         {question.questionText}
                       </p>
 
-                      {/* Debug: Show if userAnswer exists */}
-                      {process.env.NODE_ENV === 'development' && (
-                        <div className="mb-2 text-xs text-red-500">
-                          Debug: userAnswer = {question.userAnswer ? `"${question.userAnswer}"` : 'null/undefined'}
-                        </div>
-                      )}
-
-                      {question.userAnswer && (
-                        <div className="mb-3 rounded-lg bg-muted/30 p-3">
-                          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
-                            Your Answer
-                          </p>
-                          <p className="whitespace-pre-wrap text-sm leading-relaxed">
-                            {question.userAnswer}
-                          </p>
-                        </div>
-                      )}
+                      {(() => {
+                        const displayAnswer = getDisplayAnswer(question);
+                        return displayAnswer ? (
+                          <div className="mb-3 rounded-lg bg-muted/30 p-3">
+                            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted">
+                              Your Answer
+                            </p>
+                            <p className="whitespace-pre-wrap text-sm leading-relaxed">
+                              {displayAnswer}
+                            </p>
+                          </div>
+                        ) : null;
+                      })()}
 
                       <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-2">

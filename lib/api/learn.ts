@@ -27,10 +27,16 @@ export type Assessment = {
 export type AssessmentQuestion = {
   questionId: string;
   questionText: string;
+  questionType?: string;
   pointsAvailable: number;
   pointsEarned: number;
   feedback: string | null;
   userAnswer: string | null;
+  options?: Array<{
+    id: string;
+    text: string;
+    imageUrl?: string;
+  }>;
 };
 
 export type AssessmentDetail = {
