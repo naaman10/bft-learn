@@ -108,6 +108,23 @@ export function GemHuntFrame({
     };
   }, [gamesOrigin, sendInit]);
 
+  // Fallback: Send INIT_GAME after a delay if GAME_READY wasn't received
+  useEffect(() => {
+    console.log("[GemHuntFrame] Setting up fallback timer");
+    const timer = window.setTimeout(() => {
+      console.log("[GemHuntFrame] Fallback timer fired - checking if init sent:", initSent.current);
+      if (!initSent.current) {
+        console.log("[GemHuntFrame] GAME_READY not received, sending INIT_GAME proactively");
+        sendInit();
+      }
+    }, 1000);
+    
+    return () => {
+      console.log("[GemHuntFrame] Clearing fallback timer");
+      window.clearTimeout(timer);
+    };
+  }, [sendInit]);
+
   return (
     <iframe
       ref={iframeRef}
