@@ -1,21 +1,15 @@
-# Backend Fixes Required - Quiz Results Not Saving
+# Backend Fix Required - Quiz Results Not Saving
 
 ## Current Status
 
 ✅ **Game authentication working!** The game now receives tokens and sends completion data.
+✅ **Game calling correct endpoint:** `/api/games/sessions` (generic endpoint for all games)
 
-❌ **Backend has two issues preventing saves:**
+❌ **Backend has foreign key constraint error preventing saves**
 
 ## Error Analysis
 
-### Error 1: Wrong Endpoint (Game Side)
-```
-POST https://bft-api.onrender.com/api/games/sessions 500
-```
-
-The game is calling `/api/games/sessions` but should call `/quiz-generator/sessions`
-
-### Error 2: Foreign Key Constraint (Backend Side)
+### Foreign Key Constraint Error (Backend Side)
 ```json
 {
   "error": "insert or update on table 'game_sessions' violates foreign key constraint 'game_sessions_user_id_fkey'"
@@ -26,157 +20,66 @@ The backend is trying to insert a `user_id` that doesn't exist in the referenced
 
 ## Root Cause
 
-The backend has a **generic games endpoint** (`/api/games/sessions`) that:
-1. Exists and responds (not 404)
-2. Uses a different database schema (`game_sessions` table)
-3. Has incorrect foreign key references
-4. Is not suitable for quiz results
+The backend's **generic games endpoint** (`/api/games/sessions`) is:
+1. ✅ Correctly being called by the game
+2. ✅ Has the right database schema (`game_sessions` table)
+3. ❌ **Has incorrect user ID lookup** - trying to use `user.sub` directly instead of looking up `student_id`
 
-## Required Fixes
+## Required Fix
 
-### Fix 1: Update Game Endpoint (bft-games - QUICK FIX)
+### Fix the Backend `/api/games/sessions` Endpoint (bft-api)
 
-**File:** `src/games/maths-quiz/MathsQuiz.tsx` (or wherever the API call is made)
+**File:** Find the `/api/games/sessions` POST handler in bft-api (likely `src/routes/games.ts` or `src/routes/api/games/sessions.ts`)
 
-**Find this:**
+**The Problem:**
 ```typescript
-fetch(`${apiBaseUrl}/api/games/sessions`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-  },
-  body: JSON.stringify(results),
-})
+// ❌ CURRENT CODE (BROKEN)
+await c.env.DB.prepare(`
+  INSERT INTO game_sessions (user_id, score, ...)
+  VALUES (?, ?, ...)
+`).bind(user.sub, score, ...).run();  // user.sub doesn't exist in users table
 ```
 
-**Change to:**
+**The Fix:**
 ```typescript
-fetch(`${apiBaseUrl}/quiz-generator/sessions`, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
-  },
-  body: JSON.stringify(results),
-})
-```
+// ✅ FIXED CODE
+const user = c.get('user');
+const body = await c.req.json();
 
-**Just change:** `/api/games/sessions` → `/quiz-generator/sessions`
+// 1. Look up student_id from neon_user_id (from JWT)
+const student = await c.env.DB.prepare(
+  'SELECT student_id FROM students WHERE neon_user_id = ?'
+).bind(user.sub).first();
 
-This will make it call the correct endpoint (which needs to be created in Fix 2).
+if (!student) {
+  return c.json({ error: 'Student not found' }, 404);
+}
 
-### Fix 2: Create Quiz Endpoints (bft-api)
-
-The backend needs quiz-specific endpoints. Follow the complete guide in `QUIZ_BACKEND_IMPLEMENTATION.md`.
-
-**Quick summary:**
-
-#### A. Create Migration: `migrations/0XX_quiz_generator_tables.sql`
-
-```sql
-CREATE TABLE IF NOT EXISTS quiz_sessions (
-  session_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  student_id UUID NOT NULL REFERENCES students(student_id) ON DELETE CASCADE,
-  
-  year_group VARCHAR(50),
-  subject VARCHAR(100),
-  difficulty VARCHAR(50),
-  
-  score INTEGER NOT NULL,
-  total_questions INTEGER NOT NULL,
-  correct_answers INTEGER NOT NULL,
-  time_elapsed_seconds INTEGER,
-  
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  completed_at TIMESTAMPTZ DEFAULT NOW()
-);
-```
-
-#### B. Create Route: `src/routes/quiz-generator.ts`
-
-```typescript
-import { Hono } from 'hono';
-import { requireAuth } from '../middleware/require-auth';
-
-const quizRouter = new Hono();
-
-quizRouter.post('/sessions', requireAuth, async (c) => {
-  const user = c.get('user');
-  const body = await c.req.json();
-  
-  const {
+// 2. Use student_id for the foreign key
+await c.env.DB.prepare(`
+  INSERT INTO game_sessions (
+    session_id,
+    student_id,  -- Use this, not user_id!
+    game_type,
     score,
-    totalQuestions,
-    correctAnswers,
-    timeElapsed,
-    yearGroup,
-    subject,
-    difficulty,
-  } = body;
-  
-  // Get student_id from JWT (not direct user_id!)
-  const student = await c.env.DB.prepare(
-    'SELECT student_id FROM students WHERE neon_user_id = ?'
-  ).bind(user.sub).first();
-  
-  if (!student) {
-    return c.json({ error: 'Student not found' }, 404);
-  }
-  
-  // Insert session
-  const sessionId = crypto.randomUUID();
-  await c.env.DB.prepare(`
-    INSERT INTO quiz_sessions (
-      session_id, student_id, year_group, subject, difficulty,
-      score, total_questions, correct_answers, time_elapsed_seconds
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).bind(
-    sessionId,
-    student.student_id,  // Use student_id, not user_id!
-    yearGroup || null,
-    subject || null,
-    difficulty || null,
-    score,
-    totalQuestions,
-    correctAnswers,
-    timeElapsed || null
-  ).run();
-  
-  return c.json({
-    sessionId,
-    score,
-    totalQuestions,
-    correctAnswers,
-    savedAt: new Date().toISOString()
-  });
-});
-
-export default quizRouter;
+    ...
+  ) VALUES (?, ?, ?, ?, ...)
+`).bind(
+  crypto.randomUUID(),
+  student.student_id,  -- The correct foreign key reference
+  'quiz-generator',
+  body.score,
+  ...
+).run();
 ```
 
-#### C. Register Route: `src/app.ts`
+**See complete implementation in:** `BACKEND_FIX_GAMES_SESSIONS.md`
 
-```typescript
-import quizRouter from './routes/quiz-generator';
+## Why This Happens
 
-// ... existing code ...
+The JWT contains `neon_user_id` (in `user.sub`), but the database uses `students` table with `student_id` as the foreign key. The backend must do the lookup:
 
-app.route('/quiz-generator', quizRouter);
-```
-
-## Alternative: Fix Generic Games Endpoint (Not Recommended)
-
-If you want to keep using `/api/games/sessions`, you need to:
-
-1. Fix the foreign key constraint in the `game_sessions` table
-2. Update it to look up `student_id` correctly
-3. Ensure it supports quiz data format
-
-**This is not recommended** because:
-- The endpoint name doesn't match the purpose
-- It may break other games using it
-- Quiz-specific endpoints are clearer and more maintainable
+**JWT** (`user.sub`) → **students table** (`neon_user_id`) → **student_id** → **game_sessions** (`student_id`)
 
 ## Testing After Fixes
 
@@ -219,28 +122,21 @@ curl -X POST https://bft-api.onrender.com/quiz-generator/sessions \
 
 ## Summary
 
-**Issue:** Game calls wrong endpoint + backend has foreign key error
+**Issue:** Backend foreign key constraint violation
 
-**Fix Priority:**
-1. ⚠️ **Game:** Change `/api/games/sessions` → `/quiz-generator/sessions` (5 min)
-2. ⚠️ **Backend:** Create `/quiz-generator/sessions` endpoint (30-60 min)
-3. ⚠️ **Backend:** Run migration to create `quiz_sessions` table (5 min)
+**Fix:**
+1. ⚠️ **Backend:** Add student_id lookup to `/api/games/sessions` endpoint (15-30 min)
 
-**After fixes:**
-- Quiz results will save successfully
-- No more foreign key errors
-- Both frontend and game will confirm saves in console
+**After fix:**
+- Quiz results will save successfully ✅
+- No more foreign key errors ✅
+- Both frontend and game will confirm saves in console ✅
 
-## Files to Check/Modify
-
-**bft-games:**
-- Find where `POST ${apiBaseUrl}/api/games/sessions` is called
-- Change to `POST ${apiBaseUrl}/quiz-generator/sessions`
+## Files to Modify
 
 **bft-api:**
-- Create `migrations/0XX_quiz_generator_tables.sql`
-- Create `src/routes/quiz-generator.ts`
-- Update `src/app.ts` to register route
-- Run migration
+- Find: `src/routes/games.ts` or wherever `/api/games/sessions` POST handler is
+- Add: Student lookup before insert
+- Change: Use `student.student_id` instead of `user.sub`
 
-**Complete implementation details:** See `QUIZ_BACKEND_IMPLEMENTATION.md`
+**Complete implementation:** See `BACKEND_FIX_GAMES_SESSIONS.md`
