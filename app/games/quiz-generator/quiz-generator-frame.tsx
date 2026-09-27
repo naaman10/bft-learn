@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { saveQuizResults, type QuizResult } from "./actions";
 
 type QuizGeneratorFrameProps = {
   gameUrl: string;
@@ -72,7 +73,7 @@ export function QuizGeneratorFrame({
     console.log("[QuizGeneratorFrame] Setting up message listener");
     console.log("[QuizGeneratorFrame] Expected game origin:", gamesOrigin);
     
-    const onMessage = (event: MessageEvent) => {
+    const onMessage = async (event: MessageEvent) => {
       console.log("[QuizGeneratorFrame] Received ANY message:", {
         type: event.data?.type,
         origin: event.origin,
@@ -95,6 +96,37 @@ export function QuizGeneratorFrame({
         
         console.log("[QuizGeneratorFrame] GAME_READY received! Calling sendInit");
         sendInit();
+      }
+      
+      if (event.data.type === "QUIZ_COMPLETE") {
+        console.log("[QuizGeneratorFrame] QUIZ_COMPLETE message received!");
+        console.log("[QuizGeneratorFrame] Quiz results:", event.data.payload);
+        
+        if (gamesOrigin !== "*" && event.origin !== gamesOrigin) {
+          console.error("[QuizGeneratorFrame] Origin mismatch for QUIZ_COMPLETE! Expected:", gamesOrigin, "Got:", event.origin);
+          return;
+        }
+        
+        try {
+          const result = await saveQuizResults(event.data.payload as QuizResult);
+          
+          if (result.success) {
+            console.log("[QuizGeneratorFrame] ✅ Quiz results saved successfully! Session ID:", result.sessionId);
+          } else {
+            console.error("[QuizGeneratorFrame] ❌ Failed to save quiz results:", result.error);
+            
+            if (result.error?.includes("endpoint not found")) {
+              console.warn("[QuizGeneratorFrame] 💡 Backend API may not have quiz result endpoints yet.");
+              console.warn("[QuizGeneratorFrame] 💡 See QUIZ_COMPLETION_ISSUE.md for implementation details.");
+            }
+          }
+        } catch (error) {
+          console.error("[QuizGeneratorFrame] ❌ Exception while saving quiz results:", error);
+        }
+      }
+      
+      if (event.data.type === "GAME_PROGRESS") {
+        console.log("[QuizGeneratorFrame] GAME_PROGRESS message received:", event.data.payload);
       }
     };
 
