@@ -12,6 +12,11 @@ const games = [
     name: "Gem Hunt",
     description: "Find the gems and complete the challenge.",
   },
+  {
+    slug: "quiz-generator",
+    name: "Quiz Generator",
+    description: "Test your maths skills with interactive quizzes.",
+  },
 ] as const;
 
 export default async function GamesPage() {
