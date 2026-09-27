@@ -50,7 +50,9 @@ if (event.data.type === "QUIZ_COMPLETE") {
 
 ### When a Quiz is Completed:
 
-1. **Game sends message:**
+**⚠️ UPDATE:** Testing revealed the game itself needs implementation first!
+
+1. **Game SHOULD send message:** (NOT IMPLEMENTED YET)
    ```javascript
    window.parent.postMessage({
      type: "QUIZ_COMPLETE",
@@ -64,27 +66,48 @@ if (event.data.type === "QUIZ_COMPLETE") {
    }, "*");
    ```
 
-2. **Parent frame receives it:**
+2. **Parent frame receives it:** ✅ READY
    - Validates origin
    - Logs the message
    - Calls `saveQuizResults()`
 
-3. **Server action attempts to save:**
+3. **Server action attempts to save:** ✅ READY
    - Makes POST request to `/quiz-generator/sessions`
    - Includes JWT authentication
    - Returns success/failure status
 
-4. **Result logged to console:**
+4. **Result logged to console:** ✅ READY
    - ✅ Success: "Quiz results saved successfully! Session ID: xxx"
    - ❌ Failure: Descriptive error with guidance
 
+### Console Logs Show:
+```
+[QuizGeneratorFrame] INIT_GAME sent successfully  ✅
+[API Config] Base URL: https://bft-api.onrender.com  ✅
+Game completed!  ✅
+💡 Sign in to save your results  ❌ Game doesn't have token
+(No QUIZ_COMPLETE message)  ❌ Game doesn't send results
+```
+
 ## Current Status
 
-### ✅ Complete (Frontend)
+### ✅ Complete (Frontend - bft-learn)
 - Message listener for quiz completion
 - Server action to call API
 - Error handling and logging
 - Documentation
+
+### ⚠️ Pending (Game - bft-games) - **CRITICAL**
+The maths-quiz game needs postMessage handling implemented:
+
+1. **Listen for `INIT_GAME`** messages from parent
+2. **Store the authentication token** 
+3. **Send `QUIZ_COMPLETE`** messages when quiz finishes
+4. **Hide "Sign in" banner** when authenticated
+
+**See `QUIZ_GAME_IMPLEMENTATION_REQUIRED.md` for complete details.**
+
+**Reference:** Gem Hunt game has this working - copy the `useGameSession` hook
 
 ### ⚠️ Pending (Backend - bft-api)
 The backend API needs these endpoints implemented:
@@ -106,25 +129,31 @@ The backend API needs these endpoints implemented:
 
 ## Testing
 
-### Right Now (Without Backend):
+### Right Now (Without Game Implementation):
 When you complete a quiz, you'll see in the console:
 
 ```
-[QuizGeneratorFrame] QUIZ_COMPLETE message received!
-[QuizGeneratorFrame] Quiz results: { score: 8, totalQuestions: 10, ... }
-[QuizGeneratorFrame] ❌ Failed to save quiz results: Quiz API endpoint not found...
-[QuizGeneratorFrame] 💡 Backend API may not have quiz result endpoints yet.
-[QuizGeneratorFrame] 💡 See QUIZ_COMPLETION_ISSUE.md for implementation details.
+[QuizGeneratorFrame] INIT_GAME sent successfully
+[API Config] Base URL: https://bft-api.onrender.com
+Game completed!
+💡 Sign in to save your results and track your progress over time!
+(No QUIZ_COMPLETE message sent)
 ```
 
-This confirms:
-- ✅ Message is being received
-- ✅ Data is being captured
-- ⚠️ Backend endpoint doesn't exist yet (expected)
+This reveals:
+- ✅ Parent sends token successfully
+- ❌ **Game doesn't receive/process the token**
+- ❌ **Game doesn't send QUIZ_COMPLETE**
+- ❌ No results are saved
 
-### After Backend Implementation:
+### After Game Implementation:
 You'll see:
 ```
+[QuizGeneratorFrame] INIT_GAME sent successfully
+[MathsQuiz] Received INIT_GAME with auth payload
+[MathsQuiz] Authentication configured
+(User completes quiz)
+[MathsQuiz] Sending QUIZ_COMPLETE to parent
 [QuizGeneratorFrame] QUIZ_COMPLETE message received!
 [QuizGeneratorFrame] ✅ Quiz results saved successfully! Session ID: abc-123-def
 ```
@@ -133,12 +162,21 @@ And the database will have a new record in `quiz_sessions`.
 
 ## Next Steps
 
-### For Frontend Developer:
-1. ✅ Done! Code is committed and pushed
-2. Monitor console when users complete quizzes
-3. Report any messages that aren't being captured
+### For Game Developer (bft-games) - **MUST DO FIRST**
+1. ⚠️ Read `QUIZ_GAME_IMPLEMENTATION_REQUIRED.md`
+2. ⚠️ Copy `useGameSession` hook from Gem Hunt game
+3. ⚠️ Add postMessage listener to maths-quiz
+4. ⚠️ Send QUIZ_COMPLETE when quiz finishes
+5. ⚠️ Test locally with bft-learn
+6. ⚠️ Deploy to production
 
-### For Backend Developer:
+### For Frontend Developer (bft-learn):
+1. ✅ Done! Code is committed and pushed
+2. ✅ Parent frame ready to receive QUIZ_COMPLETE
+3. ✅ API save logic implemented
+4. Monitor console when users complete quizzes
+
+### For Backend Developer (bft-api):
 1. Read `QUIZ_BACKEND_IMPLEMENTATION.md`
 2. Create database migration for quiz tables
 3. Implement POST `/quiz-generator/sessions` endpoint
@@ -148,8 +186,9 @@ And the database will have a new record in `quiz_sessions`.
 ### For Product/QA:
 1. Test quiz completion in development
 2. Check console logs for errors
-3. After backend is deployed, verify data saves to database
-4. Consider adding quiz history to student dashboard
+3. After game is updated, verify QUIZ_COMPLETE is sent
+4. After backend is deployed, verify data saves to database
+5. Consider adding quiz history to student dashboard
 
 ## Benefits of This Fix
 
@@ -195,4 +234,9 @@ If you need help with:
 
 ---
 
-**Summary:** Frontend is now ready to save quiz results. Backend endpoints need to be implemented for data to actually persist to database.
+**Summary:** 
+- ✅ Frontend (bft-learn) is ready to receive and save quiz results
+- ❌ Game (bft-games/maths-quiz) needs to send authentication and results (CRITICAL)
+- ❌ Backend (bft-api) needs quiz endpoints for data persistence
+
+**The main blocker is the game implementation.** Once the maths-quiz game is updated to listen for INIT_GAME and send QUIZ_COMPLETE messages, the rest of the flow will work.
