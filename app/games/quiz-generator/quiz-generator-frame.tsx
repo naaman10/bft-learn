@@ -107,22 +107,10 @@ export function QuizGeneratorFrame({
           return;
         }
         
-        try {
-          const result = await saveQuizResults(event.data.payload as QuizResult);
-          
-          if (result.success) {
-            console.log("[QuizGeneratorFrame] ✅ Quiz results saved successfully! Session ID:", result.sessionId);
-          } else {
-            console.error("[QuizGeneratorFrame] ❌ Failed to save quiz results:", result.error);
-            
-            if (result.error?.includes("endpoint not found")) {
-              console.warn("[QuizGeneratorFrame] 💡 Backend API may not have quiz result endpoints yet.");
-              console.warn("[QuizGeneratorFrame] 💡 See QUIZ_COMPLETION_ISSUE.md for implementation details.");
-            }
-          }
-        } catch (error) {
-          console.error("[QuizGeneratorFrame] ❌ Exception while saving quiz results:", error);
-        }
+        // Note: The game itself handles saving to the backend API.
+        // We receive the completion message here for tracking/UI updates.
+        console.log("[QuizGeneratorFrame] ✅ Quiz completed successfully!");
+        console.log("[QuizGeneratorFrame] Results received from game - game handles saving to database");
       }
       
       if (event.data.type === "GAME_PROGRESS") {
