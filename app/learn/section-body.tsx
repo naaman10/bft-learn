@@ -2,6 +2,14 @@ import type { CourseSection } from "@/lib/api/learn";
 import { InfoSection } from "@/app/learn/info-section";
 import { QuestionTextSection } from "@/app/learn/question-text-section";
 import { QuestionMultipleChoiceSection } from "@/app/learn/question-multiple-choice-section";
+import { QuestionTrueOrFalseSection } from "@/app/learn/question-true-or-false-section";
+
+function isTrueOrFalseContentType(contentType: string) {
+  return (
+    contentType.replace(/[^a-zA-Z]/g, "").toLowerCase() ===
+    "questiontrueorfalse"
+  );
+}
 
 function hasOptions(section: CourseSection): boolean {
   const options = section.fields.options ?? section.fields.choices;
@@ -46,6 +54,17 @@ export function SectionBody({
 
   if (section.contentType === "infoSection") {
     return <InfoSection section={section} />;
+  }
+
+  if (isTrueOrFalseContentType(section.contentType)) {
+    return (
+      <QuestionTrueOrFalseSection
+        section={section}
+        savedAnswer={savedAnswer}
+        showAnswer={variant === "task"}
+        contentId={contentId}
+      />
+    );
   }
 
   if (isQuestionType(section.contentType)) {
