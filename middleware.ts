@@ -9,7 +9,7 @@ export const config = {
     "/dashboard",
     "/dashboard/:path*",
     "/learn",
-    "/learn/:path*",
+    "/learn/((?!test-autosave).*)",
     "/auth/set-password",
   ],
 };

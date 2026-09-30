@@ -102,7 +102,7 @@ export function QuestionTextSection({
             defaultValue={defaultAnswer}
           />
         ) : (
-          <>
+          <div className="space-y-2">
             <label className="sr-only" htmlFor={`answer-${section.entryId ?? "question"}`}>
               Your answer
             </label>
@@ -114,7 +114,12 @@ export function QuestionTextSection({
               placeholder="Write your answer here…"
               className="mt-1 min-h-40 w-full resize-y rounded-[22px] border border-border bg-background px-4 py-3.5 text-left text-lg leading-relaxed text-foreground placeholder:text-stone-400 outline-none focus:border-accent focus:ring-2 focus:ring-ring"
             />
-          </>
+            {!section.entryId && (
+              <p className="text-sm text-amber-600">
+                ⚠ Auto-save is unavailable for this question due to a configuration issue.
+              </p>
+            )}
+          </div>
         )
       ) : null}
     </div>

@@ -4,6 +4,13 @@ import { redirect } from "next/navigation";
 import { ApiError } from "@/lib/api/client";
 import { completeLearnContent, saveLearnProgress } from "@/lib/api/learn";
 
+function isValidItemId(id: string): boolean {
+  // Check if it's a valid CMS entry ID (not just a numeric index)
+  // Valid IDs are typically alphanumeric strings with specific patterns
+  // Reject simple numeric strings like "0", "1", "2"
+  return id.length > 0 && !/^\d+$/.test(id);
+}
+
 export async function completeContent(
   _prevState: { error: string } | null,
   formData: FormData
@@ -21,6 +28,11 @@ export async function completeContent(
   };
 
   if (itemId && typeof answer === "string") {
+    if (!isValidItemId(itemId)) {
+      console.error("[learn] Invalid item ID format", { contentId, itemId });
+      return { error: "Invalid question ID. Please contact support." };
+    }
+    
     patch.currentItemId = itemId;
     patch.items = {
       [itemId]: {
@@ -55,6 +67,11 @@ export async function saveProgress(
 ): Promise<{ success: boolean; error?: string }> {
   if (!contentId || !itemId) {
     return { success: false, error: "Invalid request" };
+  }
+
+  if (!isValidItemId(itemId)) {
+    console.error("[learn] Invalid item ID format for auto-save", { contentId, itemId });
+    return { success: false, error: "Invalid question ID" };
   }
 
   try {
