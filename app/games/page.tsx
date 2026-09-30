@@ -17,6 +17,12 @@ const games = [
     name: "Quiz Generator",
     description: "Test your maths skills with interactive quizzes.",
   },
+  {
+    slug: "reading-detective",
+    name: "BFT Detective",
+    description:
+      "Search storybook scenes for clues and answer reading questions.",
+  },
 ] as const;
 
 export default async function GamesPage() {
